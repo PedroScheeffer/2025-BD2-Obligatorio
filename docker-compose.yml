@@ -1,0 +1,43 @@
+services:
+  frontend:
+    build:
+      context: ./frontend/ucu-web
+      dockerfile: ../Dockerfile
+    container_name: frontend_votos
+    ports:
+      - "5173:5173"
+    depends_on:
+      - app
+    volumes:
+      - ./frontend/ucu-web:/app
+      - node_modules_volume:/app/node_modules
+    networks:
+      - ucu_network
+
+  app:
+    build:
+      context: ./backend/src
+      dockerfile: ../Dockerfile # Un directorio atrás de "./src".
+    container_name: backend_votos
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USER=presi
+      - DB_PASSWORD=votosecreto
+      - DB_NAME=IC_Grupo3
+    volumes:
+      - ./backend/src:/src
+
+    networks:
+      - ucu_network
+
+
+volumes:
+  node_modules_volume:
+
+networks:
+  ucu_network:

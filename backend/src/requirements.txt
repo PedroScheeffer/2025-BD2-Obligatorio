@@ -1,0 +1,6 @@
+# Requerimientos/dependencias.
+Faker
+Fastapi
+pydantic
+mysql-connector-python
+uvicorn
