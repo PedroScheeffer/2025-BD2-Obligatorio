@@ -6,9 +6,6 @@ class MySQLScriptGenerator:
         
         En otras palabras, no usamos `f-strings` para colocar en los scriptos los valores brindados por los usuarios.
         
-        Nota: Una entidad representa algo de la vida real (ej. instructor, equipamiento, etc.) que se insertará, actualizará o eliminará en la base de datos
-        como un registro de 'x' tabla.
-        
         Nota: Para filtrar registros sólo se toma no más que un atributo y valor. Esto se hace así para simplificar el código, además, la mayoría
         de tablas de la base de datos sólo necesita un atributo en la cláusula WHERE para filtrar satisfactoriamente.
         
