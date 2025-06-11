@@ -37,7 +37,7 @@ async def check_database_connection():
 
 
 ## PERSONA 
-@router.get("/persona/{cc}")
+@router.get("/personas/{cc}")
 async def get_persona_by_cc(cc: str, headers: dict = Depends(get_auth_headers)):
     try:
         return PersonaService.get_persona_by_cc(cc, headers)
@@ -53,7 +53,7 @@ async def get_all_personas(headers: dict = Depends(get_auth_headers)):
         logging.error(f"Error getting all personas: {e}")
         raise HTTPException(status_code=500, detail=str(e))
     
-@router.post("/persona")
+@router.post("/personas")
 async def create_persona(persona_data: PersonaSchema, headers: dict = Depends(get_auth_headers)):
     try:
         return PersonaService.create_persona(persona_data, headers)
@@ -61,7 +61,7 @@ async def create_persona(persona_data: PersonaSchema, headers: dict = Depends(ge
         logging.error(f"Error creating persona: {e}")
         raise HTTPException(status_code=400, detail=str(e))
 
-@router.put("/persona/{cc}")
+@router.put("/personas/{cc}")
 async def update_persona(cc: str, persona_data: PersonaSchema, headers: dict = Depends(get_auth_headers)):
     try:
         return PersonaService.update_persona(cc, persona_data, headers)
@@ -69,7 +69,7 @@ async def update_persona(cc: str, persona_data: PersonaSchema, headers: dict = D
         logging.error(f"Error updating persona with CC {cc}: {e}")
         raise HTTPException(status_code=400, detail=str(e))
     
-@router.delete("/persona/{cc}")
+@router.delete("/personas/{cc}")
 async def delete_persona(cc: str, headers: dict = Depends(get_auth_headers)):
     try:
         return PersonaService.delete_persona(cc, headers)
