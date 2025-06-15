@@ -10,7 +10,7 @@ Permite gestionar los diferentes modelos de ubicacion
 Servicio Circuito
 Se encarga de todo lo relacionado con el circuito y la mesa
 
-Servicio Eleccion.
+Servicio Elección.
 Gestiona las diferentes elecciones y votacion, veirifaciones y valida datos.
 
 Servicio Partido
