@@ -4,11 +4,14 @@ Proyecto para base de datos II, equipo 3
 Servicio Persona,
 permite gestionar la persona y con sus diferente roles, crearlas y consultar su información
 
-Servicio Ubicacion
+Servicio Geografico
 Permite gestionar los diferentes modelos de ubicacion
+Se encarga de todo lo relacionado con el circuito
 
-Servicio Circuito
-Se encarga de todo lo relacionado con el circuito y la mesa
+Servicio Mesa
+Abrir y cerrar mesas por circuito.
+Control estricto de cierre (no se permite más votos ni reabrir).
+Vista de resultados para el presidente cuando la mesa está cerrada.
 
 Servicio Elección.
 Gestiona las diferentes elecciones y votacion, veirifaciones y valida datos.
