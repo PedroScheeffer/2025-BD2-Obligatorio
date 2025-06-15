@@ -2,7 +2,7 @@ from typing import List, Optional
 from backend.src.model.Persona import Persona, PersonaSchema
 from backend.src.utils.Validator import Validator
 
-
+# Esta clase se encarga de persona y sus genericaciones
 class PersonaService:
     @staticmethod
     def create_persona(persona_data: PersonaSchema, headers: dict) -> dict:
