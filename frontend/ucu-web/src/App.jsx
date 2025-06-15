@@ -1,22 +1,15 @@
 import { useState } from "react";
-import { Tabs, Tab, Box } from "@mui/material";
-import "./App.css";
+import { Box } from "@mui/material";
+import Header from "./components/Header";
+import Layout from "./components/Layout";
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
-  const [tabIndex, setTabIndex] = useState(0);
-
-  const handleTabChange = (event, newValue) => {
-    setTabIndex(newValue);
-  };
-
-  if (!isLoggedIn) {
-    return <div>Please log in to access the app.</div>;
-  }
+  const [currentPage, setCurrentPage] = useState("elecciones");
 
   return (
-    <Box sx={{ width: "100%" }}>
-      <TextField>clean bs </TextField>
+    <Box sx={{ width: "100%", height: "100vh", display: "flex", flexDirection: "column" }}>
+      <Header />
+      <Layout currentPage={currentPage} setCurrentPage={setCurrentPage} />
     </Box>
   );
 }
