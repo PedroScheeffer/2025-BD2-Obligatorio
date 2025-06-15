@@ -4,10 +4,11 @@ import { Box } from "@mui/material";
 import Header from "./components/Header";
 import Layout from "./components/Layout";
 import Login from "./pages/Login";
+import Votar from "./pages/Votar";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [rol, setRol] = useState(null); // "votante" o "funcionario"
+  const [rol, setRol] = useState(null); 
   const [currentPage, setCurrentPage] = useState("elecciones");
 
   const handleLogin = (selectedRol) => {
@@ -24,8 +25,7 @@ function App() {
         <Layout currentPage={currentPage} setCurrentPage={setCurrentPage} />
       ) : (
         <Box sx={{ p: 4 }}>
-          <h2>Bienvenido, votante</h2>
-          {/* Acá podrías renderizar algo especial para el votante */}
+          <Votar />
         </Box>
       )}
     </Box>

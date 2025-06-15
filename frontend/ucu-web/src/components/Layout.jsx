@@ -4,6 +4,7 @@ import EleccionesForm from "../pages/EleccionesForm";
 import ListaForm from "../pages/ListaForm";
 import CandidatosForm from "../pages/CandidatosForm";
 import CircuitosForm from "../pages/CircuitosForm";
+import VerResultados from "../pages/VerResultados";
 
 const Layout = ({ currentPage, setCurrentPage }) => {
   const renderContent = () => {
@@ -16,6 +17,8 @@ const Layout = ({ currentPage, setCurrentPage }) => {
         return <CandidatosForm />;
       case "circuitos":
         return <CircuitosForm />;
+      case "ver-resultados": 
+        return <VerResultados tipo={currentPage} />;
       default:
         return <div>Seleccioná una opción</div>;
     }

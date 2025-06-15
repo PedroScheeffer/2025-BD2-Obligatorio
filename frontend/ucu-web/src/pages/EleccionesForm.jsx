@@ -6,7 +6,7 @@ const EleccionesForm = () => {
   const [tipo, setTipo] = useState("");
   const [fecha, setFecha] = useState("");
 
-  const tiposEleccion = ["Nacional", "Departamental", "Municipal"];
+  const tiposEleccion = ["Nacional", "Departamental", "Municipal", "Plebiscito", "Ballotage", "Referendum"];
 
   return (
     <FormContainer>
