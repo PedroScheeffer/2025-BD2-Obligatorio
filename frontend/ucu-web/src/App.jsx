@@ -1,24 +1,36 @@
 import { useState } from "react";
-import { Tabs, Tab, Box } from "@mui/material";
-import "./App.css";
+//import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Box } from "@mui/material";
+import Header from "./components/Header";
+import Layout from "./components/Layout";
+import Login from "./pages/Login";
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
-  const [tabIndex, setTabIndex] = useState(0);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [rol, setRol] = useState(null); // "votante" o "funcionario"
+  const [currentPage, setCurrentPage] = useState("elecciones");
 
-  const handleTabChange = (event, newValue) => {
-    setTabIndex(newValue);
+  const handleLogin = (selectedRol) => {
+    setRol(selectedRol);
+    setIsLoggedIn(true);
   };
 
-  if (!isLoggedIn) {
-    return <div>Please log in to access the app.</div>;
-  }
-
   return (
-    <Box sx={{ width: "100%" }}>
-      <TextField>clean bs </TextField>
+    <Box sx={{ width: "100%", height: "100vh", display: "flex", flexDirection: "column" }}>
+      <Header />
+      {!isLoggedIn ? (
+        <Login onLogin={handleLogin} />
+      ) : rol === "funcionario" ? (
+        <Layout currentPage={currentPage} setCurrentPage={setCurrentPage} />
+      ) : (
+        <Box sx={{ p: 4 }}>
+          <h2>Bienvenido, votante</h2>
+          {/* Acá podrías renderizar algo especial para el votante */}
+        </Box>
+      )}
     </Box>
   );
 }
 
 export default App;
+
