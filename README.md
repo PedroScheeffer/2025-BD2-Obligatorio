@@ -18,3 +18,6 @@ Gestiona las diferentes elecciones y votacion, veirifaciones y valida datos.
 
 Servicio Partido
 Se encarga de gestionar lo relacionado con partidos, lista y candidatos.
+
+
+# Casos de uso por rol
