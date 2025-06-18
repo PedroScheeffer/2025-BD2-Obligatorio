@@ -1,12 +1,10 @@
-from typing import Optional
-from pydantic import BaseModel, Field
-from model.BaseEntity import BaseEntity
-from model.personas.Persona import Persona
+from pydantic import  Field
+from model.personas.Persona import Persona, PersonaSchema
 
 
-class CandidatoSchema(BaseModel):
-    cc_persona: str = Field(..., description="Credencial cívica de la persona")
-    id_tipo: int = Field(..., description="ID del tipo de candidato")
+class CandidatoSchema(PersonaSchema):
+    cc_persona: str 
+    id_tipo: int 
 
 
 class Candidato(Persona):

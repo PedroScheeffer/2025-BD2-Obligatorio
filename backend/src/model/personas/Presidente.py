@@ -1,10 +1,10 @@
 from typing import Optional
 from pydantic import BaseModel, Field
 from model.BaseEntity import BaseEntity
-from model.personas.Persona import Persona
+from model.personas.Persona import Persona, PersonaSchema
 
 
-class PresidenteSchema(BaseModel):
+class PresidenteSchema(PersonaSchema):
     cc_persona: str = Field(..., description="Credencial cívica de la persona")
 
 
