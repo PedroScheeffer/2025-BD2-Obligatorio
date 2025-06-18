@@ -1,0 +1,12 @@
+.header {
+  width: 100vw;           
+  background-color: #dbeeff;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;    
+}
+
+.header img {
+  height: 70px;             
+}
