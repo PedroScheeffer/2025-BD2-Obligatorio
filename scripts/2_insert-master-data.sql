@@ -1,7 +1,7 @@
 USE IC_Grupo3;
 
 -- Insert master data into the database
-INSERT INTO TIPOCANDIDATO (descripcion) VALUES
+INSERT INTO TIPOCANDIDATO (tipo) VALUES
 ('presidente'),
 ('vicepresidente'),
 ('senador'),

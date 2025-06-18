@@ -181,3 +181,54 @@ class MySQLScriptRunner:
             # Asegura que la conexión se cierre en cualquier caso.
             cls.__end_database_connection()
         return result
+
+    @classmethod
+    def run_insert_script_and_get_id(cls, script: str, params: tuple = None) -> int:
+        """
+            Ejecuta un script de INSERT en MySQL y retorna el ID del registro insertado.
+
+            Entradas:
+                - `script`: el script MySQL INSERT a ejecutar.
+                - `params`: tupla que contiene los valores que reemplazarán los placeholders `%s` en la consulta MySQL.
+
+            Salida:
+                - El ID del registro insertado, o None si hubo un error.
+
+            Estado: método completado.
+        """
+        result = None
+        try:
+            # Establece la conexión con la base de datos.
+            cls.__start_database_connection()
+
+            # Crea el cursor para ejecutar el comando SQL.
+            cursor = cls.__CONNECTION.cursor()
+
+            # Ejecuta el script de inserción.
+            if (params is None):
+                cursor.execute(script)
+            else:
+                cursor.execute(script, params)
+
+            # Obtiene el ID del último registro insertado
+            last_id = cursor.lastrowid
+
+            # Confirma (commit) los cambios en la base de datos.
+            cls.__CONNECTION.commit()
+
+            # Cierra el cursor.
+            cursor.close()
+            result = last_id
+        except mysql.connector.Error as error:
+            cls.__logger.error(
+                f"Error al ejecutar el script de inserción: {error}")
+
+            # Realiza un rollback para revertir los cambios en caso de error.
+            if cls.__CONNECTION:
+                cls.__CONNECTION.rollback()
+
+            result = None
+        finally:
+            # Asegura que la conexión se cierre en cualquier caso.
+            cls.__end_database_connection()
+        return result
