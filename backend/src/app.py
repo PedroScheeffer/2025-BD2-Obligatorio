@@ -32,7 +32,6 @@ from utils.DataCreator import (
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Only for dev/demo! Remove or guard for production!
     zonas = create_and_insert_zonas(5)
     establecimientos = create_and_insert_establecimientos(zonas, 10)
     personas = create_and_insert_personas(20)
