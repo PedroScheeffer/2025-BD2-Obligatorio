@@ -10,22 +10,26 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [rol, setRol] = useState(null); 
   const [currentPage, setCurrentPage] = useState("elecciones");
+  const [persona, setPersona] = useState(null);
 
-  const handleLogin = (selectedRol) => {
+  const handleLogin = (selectedRol, data) => {
     setRol(selectedRol);
-    setIsLoggedIn(true);
+      setIsLoggedIn(true);
+      setPersona(data.persona); 
+
+      console.log("Usuario logueado:", data.persona);
   };
 
   return (
     <Box sx={{ width: "100%", height: "100vh", display: "flex", flexDirection: "column" }}>
-      <Header />
+      <Header persona={persona}/>
       {!isLoggedIn ? (
         <Login onLogin={handleLogin} />
       ) : rol === "funcionario" ? (
         <Layout currentPage={currentPage} setCurrentPage={setCurrentPage} />
       ) : (
         <Box sx={{ p: 4 }}>
-          <Votar />
+          <Votar persona={persona}/>
         </Box>
       )}
     </Box>
@@ -34,3 +38,36 @@ function App() {
 
 export default App;
 
+/*
+function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [rol, setRol] = useState(null); 
+  const [persona, setPersona] = useState(null);
+  const [currentPage, setCurrentPage] = useState("elecciones");
+
+  const handleLogin = (selectedRol, data) => {
+    setRol(selectedRol);
+      setIsLoggedIn(true);
+      setPersona(data.persona); 
+
+      console.log("Usuario logueado:", data.persona);
+  };
+
+  return (
+    <Box sx={{ width: "100%", height: "100vh", display: "flex", flexDirection: "column" }}>
+      <Header persona={persona} rol={rol} />
+      {!isLoggedIn ? (
+        <Login onLogin={handleLogin} />
+      ) : rol === "funcionario" ? (
+        <Layout currentPage={currentPage} setCurrentPage={setCurrentPage} />
+      ) : (
+        <Box sx={{ p: 4 }}>
+          <Votar persona={persona} />
+        </Box>
+      )}  
+    </Box>
+  );
+}
+
+export default App;
+*/
