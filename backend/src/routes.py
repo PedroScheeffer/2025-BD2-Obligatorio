@@ -3,7 +3,7 @@ from typing import Optional
 import logging
 
 # servicios.
-from backend.src.model.Persona import PersonaSchema
+from model.personas.Persona import PersonaSchema
 from services.PersonaService import PersonaService
 
 # MODEL PARA CHECKEAR CONEXIÓN A LA BASE DE DATOS.
@@ -22,7 +22,7 @@ async def get_auth_headers(
 # PRINCIPAL.
 @router.get("/")
 async def home():
-    return {"message": "Escuela de deportes de nieve de la UCU"}
+    return {"message": "Aplicacion de votos"}
 
 # PARA CHECKEAR CONEXIÓN A LA BASE DE DATOS.
 @router.get("/ping")
