@@ -8,12 +8,43 @@ const EleccionesForm = () => {
 
   const tiposEleccion = ["Nacional", "Departamental", "Municipal", "Plebiscito", "Ballotage", "Referendum"];
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch("http://localhost:8000/elecciones", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          tipo,
+          fecha,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al cargar la elección");
+      }
+
+      alert("Elección cargada exitosamente");
+      setTipo("");
+      setFecha("");
+    } catch (err) {
+      alert("Error: " + err.message);
+    }
+  };
+
   return (
     <FormContainer>
       <Typography variant="h5" gutterBottom align="center">
         CARGAR ELECCIONES
       </Typography>
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+      <Box
+        component="form"
+        onSubmit={handleSubmit}
+        sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+      >
         <TextField
           select
           label="Tipo de elección"
@@ -38,10 +69,17 @@ const EleccionesForm = () => {
         />
 
         <Box sx={{ display: "flex", justifyContent: "space-around", mt: 2 }}>
-          <Button variant="contained" color="success">
+          <Button type="submit" variant="contained" color="success">
             Aceptar
           </Button>
-          <Button variant="contained" color="error">
+          <Button
+            variant="contained"
+            color="error"
+            onClick={() => {
+              setTipo("");
+              setFecha("");
+            }}
+          >
             Cancelar
           </Button>
         </Box>
