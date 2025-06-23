@@ -25,21 +25,19 @@ CREATE TABLE ZONA (
 );
 
 CREATE TABLE ESTABLECIMIENTO (
-    id INTEGER AUTO_INCREMENT ,
+    id INTEGER AUTO_INCREMENT PRIMARY KEY,
     tipo VARCHAR(255),
     direccion JSON, -- Direccion en formato JSON, con los campos: calle, numero, entre calles, barrio.
     id_zona INTEGER NOT NULL ,
-    PRIMARY KEY (id, id_zona),
     FOREIGN KEY (id_zona) REFERENCES ZONA(id) ON DELETE CASCADE
 );
 
 CREATE TABLE ELECCION (
-    id INTEGER AUTO_INCREMENT ,
+    id INTEGER AUTO_INCREMENT PRIMARY KEY,
 
     fecha DATE NOT NULL,
     id_tipo_eleccion INTEGER NOT NULL ,
 
-    PRIMARY KEY (id, id_tipo_eleccion),
     FOREIGN KEY (id_tipo_eleccion) REFERENCES TIPOELECCION(id)
 );
 
@@ -153,7 +151,7 @@ CREATE TABLE LISTA (
 
 
 CREATE TABLE VOTO (
-    id INTEGER AUTO_INCREMENT,
+    id INTEGER AUTO_INCREMENT PRIMARY KEY,
     valor_lista INTEGER NOT NULL,
     id_partido INTEGER NOT NULL,
     id_eleccion INTEGER NOT NULL,
@@ -163,7 +161,6 @@ CREATE TABLE VOTO (
     id_circuito INTEGER NOT NULL,
     fecha DATE NOT NULL,
 
-    PRIMARY KEY (id, id_tipo_voto, valor_lista, id_circuito),
     FOREIGN KEY (id_tipo_voto) REFERENCES TIPOVOTO(id),
     FOREIGN KEY (valor_lista, id_partido, id_eleccion, id_tipo_eleccion) REFERENCES LISTA(valor, id_partido, id_eleccion, id_tipo_eleccion),
     FOREIGN KEY (id_circuito) REFERENCES CIRCUITO(id)
