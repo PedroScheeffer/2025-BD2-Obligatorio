@@ -29,7 +29,8 @@ class PersonaSchema(BaseModel):
 class Persona(BaseEntity):
     table_name = "PERSONA"
     values_needed = ["cc", "ci", "nombre", "fecha_nacimiento"]
-
+    primary_key = "cc"
+    
     def __init__(self, cc: str, ci: int, nombre: str, fecha_nacimiento: str):
         self.cc = cc
         self.ci = ci

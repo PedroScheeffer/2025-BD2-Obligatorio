@@ -5,7 +5,7 @@ services:
       dockerfile: ../Dockerfile
     container_name: frontend_votos
     ports:
-      - "5173:5173"
+      - "80:5173"
     depends_on:
       - app
     volumes:

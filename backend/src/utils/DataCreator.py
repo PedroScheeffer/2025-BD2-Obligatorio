@@ -1,4 +1,6 @@
-from typing import List
+import json
+from typing import List, Union
+from model.schemas.Direccion import DireccionSchema
 from model.relacion.CandidatoLista import CandidatoLista
 from faker import Faker
 from random import choice, randint
@@ -16,7 +18,7 @@ from model.Lista import Lista
 from model.Eleccion import Eleccion
 from model.Voto import Voto
 from model.ubicacion.Zona import Zona
-from model.ubicacion.Establecimiento import Establecimiento
+from model.ubicacion.Establecimiento import Establecimiento, EstablecimientoSchema
 from model.ubicacion.Circuito import Circuito
 from model.ubicacion.Mesa import Mesa
 from model.tipos.TipoCandidato import TipoCandidatoEnum
@@ -28,7 +30,7 @@ fake = Faker('es_ES')
 # --- ZONA ---
 
 
-def create_random_zona():
+def create_random_zona() -> Zona:
     # Use province() if available, else fallback to state() or a US state
     if hasattr(fake, "province"):
         departamento = fake.province()
@@ -47,45 +49,48 @@ def create_random_zona():
     )
 
 
-def create_and_insert_zonas(n=5):
+def create_and_insert_zonas(n: int = 5) -> List[int]:
     zonas = []
+    ids = []
     for _ in range(n):
         zona = create_random_zona()
         zona.crud().insert(zona)
         zonas.append(zona)
-    return zonas
+        ids.append(zona.id)
+    return ids
 
 # --- ESTABLECIMIENTO ---
 
 
-def create_random_establecimiento(zona_id):
-    direccion = {
-        "calle": fake.street_name(),
-        "numero": fake.building_number(),
-        "barrio": fake.city(),
-        "entre_calles": f"{fake.street_name()} y {fake.street_name()}"
-    }
-    return Establecimiento(
+def create_random_establecimiento(zona_id: int) -> Establecimiento:
+    direccion = DireccionSchema(
+        calle=fake.street_name(),
+        numero=fake.building_number(),
+        ciudad=fake.city(),
+        departamento=fake.city(),
+        codigo_postal=fake.postcode()
+    )
+    schema = EstablecimientoSchema(
         id=None,
         tipo=fake.word(),
         direccion=direccion,
-        id_zona=zona_id
-    )
+        id_zona=zona_id)
+    return Establecimiento(**schema.model_dump())
 
 
-def create_and_insert_establecimientos(zonas, n=10):
-    establecimientos = []
+def create_and_insert_establecimientos(zonas_ids: List[int], n: int = 10) -> List[int]:
+    ids = []
     for _ in range(n):
-        zona = choice(zonas)
-        est = create_random_establecimiento(zona.id)
+        z_id = choice(zonas_ids)
+        est = create_random_establecimiento(z_id)
         est.crud().insert(est)
-        establecimientos.append(est)
-    return establecimientos
+        ids.append(est.id)
+    return ids
 
 # --- PERSONA ---
 
 
-def create_random_persona():
+def create_random_persona() -> Persona:
     cc = fake.bothify(text='??? #####')
     ci = fake.random_number(digits=8, fix_len=True)
     nombre = fake.name()
@@ -95,18 +100,20 @@ def create_random_persona():
     return Persona(cc=cc, ci=ci, nombre=nombre, fecha_nacimiento=fecha_nacimiento_str)
 
 
-def create_and_insert_personas(n=20):
+def create_and_insert_personas(n: int = 20) -> List[str]:
     personas = []
+    ccs = []
     for _ in range(n):
         persona = create_random_persona()
         persona.crud().insert(persona)
         personas.append(persona)
-    return personas
+        ccs.append(persona.cc)
+    return ccs
 
 # --- PARTIDO ---
 
 
-def create_random_partido():
+def create_random_partido() -> Partido:
     nombre = fake.company()
     direccion_sede = {
         "calle": fake.street_name(),
@@ -120,63 +127,65 @@ def create_random_partido():
     return Partido(id=None, nombre=nombre, direccion_sede=direccion_sede_json)
 
 
-def create_and_insert_partidos(n=5):
+def create_and_insert_partidos(n: int = 5) -> List[int]:
     partidos = []
+    ids = []
     for _ in range(n):
         partido = create_random_partido()
         partido.crud().insert(partido)
         partidos.append(partido)
-    return partidos
+        ids.append(partido.id)
+    return ids
 
 # --- ELECCION ---
 
 
-def create_random_eleccion():
+def create_random_eleccion() -> Eleccion:
     fecha = fake.date_between(start_date='-5y', end_date='+1y')
     fecha_str = fecha.strftime('%Y-%m-%d')  # Convert to string format
     tipo = randint(1, 5)  # Assuming 5 types in master data
     return Eleccion(id=None, fecha=fecha_str, id_tipo_eleccion=tipo)
 
 
-def create_and_insert_elecciones(n=5):
+def create_and_insert_elecciones(n: int = 5) -> List[int]:
     elecciones = []
+    ids = []
     for _ in range(n):
         eleccion = create_random_eleccion()
         eleccion.crud().insert(eleccion)
         elecciones.append(eleccion)
-    return elecciones
+        ids.append(eleccion.id)
+    return ids
 
 # --- CIRCUITO ---
 
 
-def create_random_circuito(est_id, zona_id, eleccion_id, tipo_eleccion_id):
+def create_random_circuito(est_id: int, eleccion_id: int, tipo_eleccion_id: int) -> Circuito:
     return Circuito(
         id=None,
         accesibilidad=fake.boolean(),
         id_establecimiento=est_id,
-        id_zona=zona_id,
         id_eleccion=eleccion_id,
         id_tipo_eleccion=tipo_eleccion_id
     )
 
 
-def create_and_insert_circuitos(est_ids, zona_ids, eleccion_ids, tipo_eleccion_ids, n=10):
-    circuitos = []
+def create_and_insert_circuitos(est_ids: List[int], eleccion_ids: List[int], tipo_eleccion_ids: List[int], n: int = 10) -> List[int]:
+    ids = []
     for _ in range(n):
         circuito = create_random_circuito(
             choice(est_ids),
-            choice(zona_ids),
             choice(eleccion_ids),
             choice(tipo_eleccion_ids)
         )
         circuito.crud().insert(circuito)
-        circuitos.append(circuito)
-    return circuitos
+        ids.append(circuito.id)
+    return ids
 
 # --- MESA ---
 
 
-def create_random_mesa(circuito_id, vocal_cc, secretario_cc, presidente_cc):
+def create_random_mesa(circuito_id: int, vocal_cc: str, secretario_cc: str, presidente_cc: str) -> Mesa:
     return Mesa(
         id=None,
         id_circuito=circuito_id,
@@ -186,8 +195,9 @@ def create_random_mesa(circuito_id, vocal_cc, secretario_cc, presidente_cc):
     )
 
 
-def create_and_insert_mesas(circuito_ids, vocal_ccs, secretario_ccs, presidente_ccs, n=10):
+def create_and_insert_mesas(circuito_ids: List[int], vocal_ccs: List[str], secretario_ccs: List[str], presidente_ccs: List[str], n: int = 10) -> List[int]:
     mesas = []
+    ids = []
     for _ in range(n):
         mesa = create_random_mesa(
             choice(circuito_ids),
@@ -197,12 +207,13 @@ def create_and_insert_mesas(circuito_ids, vocal_ccs, secretario_ccs, presidente_
         )
         mesa.crud().insert(mesa)
         mesas.append(mesa)
-    return mesas
+        ids.append(mesa.id)
+    return ids
 
 # --- VOTANTE ---
 
 
-def create_random_votante(cc_persona: str, circuito_id):
+def create_random_votante(cc_persona: str, circuito_id: int) -> Votante:
     return Votante(
         cc_persona=cc_persona,
         voto=fake.boolean(),
@@ -210,8 +221,9 @@ def create_random_votante(cc_persona: str, circuito_id):
     )
 
 
-def create_and_insert_votantes(persona_ccs: List[str], circuito_ids, n=10):
+def create_and_insert_votantes(persona_ccs: List[str], circuito_ids: List[int], n: int = 10) -> List[str]:
     votantes = []
+    ccs = []
     for _ in range(n):
         votante = create_random_votante(
             choice(persona_ccs),
@@ -219,136 +231,145 @@ def create_and_insert_votantes(persona_ccs: List[str], circuito_ids, n=10):
         )
         votante.crud().insert(votante)
         votantes.append(votante)
-    return votantes
+        ccs.append(votante.cc_persona)
+    return ccs
 
 # --- POLICIA ---
 
 
-def create_random_policia(cc_persona, est_id, zona_id):
+def create_random_policia(cc_persona: str, est_id: int) -> Policia:
     return Policia(
         cc_persona=cc_persona,
         comisaria=fake.word(),
-        fk_id_establecimiento=est_id,
-        fk_id_zona=zona_id
+        fk_id_establecimiento=est_id
     )
 
 
-def create_and_insert_policias(persona_ccs, est_ids, zona_ids, n=5):
+def create_and_insert_policias(persona_ccs: List[str], est_ids: List[int], n: int = 5) -> List[str]:
     policias = []
+    ccs = []
     for _ in range(n):
         policia = create_random_policia(
             choice(persona_ccs),
-            choice(est_ids),
-            choice(zona_ids)
+            choice(est_ids)
         )
         policia.crud().insert(policia)
         policias.append(policia)
-    return policias
+        ccs.append(policia.cc_persona)
+    return ccs
 
 # --- FUNCIONARIO ---
 
 
-def create_random_funcionario(cc_persona):
+def create_random_funcionario(cc_persona: str) -> Funcionario:
     return Funcionario(cc_persona=cc_persona)
 
 
-def create_and_insert_funcionarios(persona_ccs, n=5):
+def create_and_insert_funcionarios(persona_ccs: List[str], n: int = 5) -> List[str]:
     funcionarios = []
+    ccs = []
     for _ in range(n):
         funcionario = create_random_funcionario(choice(persona_ccs))
         funcionario.crud().insert(funcionario)
         funcionarios.append(funcionario)
-    return funcionarios
+        ccs.append(funcionario.cc_persona)
+    return ccs
 
 # --- PRESIDENTE ---
 
 
-def create_random_presidente(cc_persona):
+def create_random_presidente(cc_persona: str) -> Presidente:
     return Presidente(cc_persona=cc_persona)
 
 
-def create_and_insert_presidentes(funcionario_ccs, n=2):
+def create_and_insert_presidentes(funcionario_ccs: List[str], n: int = 2) -> List[str]:
     presidentes = []
+    ccs = []
     for _ in range(n):
         presidente = create_random_presidente(choice(funcionario_ccs))
         presidente.crud().insert(presidente)
         presidentes.append(presidente)
-    return presidentes
+        ccs.append(presidente.cc_persona)
+    return ccs
 
 # --- SECRETARIO ---
 
 
-def create_random_secretario(cc_persona):
+def create_random_secretario(cc_persona: str) -> Secretario:
     return Secretario(cc_persona=cc_persona)
 
 
-def create_and_insert_secretarios(funcionario_ccs, n=2):
+def create_and_insert_secretarios(funcionario_ccs: List[str], n: int = 2) -> List[str]:
     secretarios = []
+    ccs = []
     for _ in range(n):
         secretario = create_random_secretario(choice(funcionario_ccs))
         secretario.crud().insert(secretario)
         secretarios.append(secretario)
-    return secretarios
+        ccs.append(secretario.cc_persona)
+    return ccs
 
 # --- VOCAL ---
 
 
-def create_random_vocal(cc_persona):
+def create_random_vocal(cc_persona: str) -> Vocal:
     return Vocal(cc_persona=cc_persona)
 
 
-def create_and_insert_vocales(funcionario_ccs, n=2):
+def create_and_insert_vocales(funcionario_ccs: List[str], n: int = 2) -> List[str]:
     vocales = []
+    ccs = []
     for _ in range(n):
         vocal = create_random_vocal(choice(funcionario_ccs))
         vocal.crud().insert(vocal)
         vocales.append(vocal)
-    return vocales
+        ccs.append(vocal.cc_persona)
+    return ccs
 
 # --- CANDIDATO ---
 
 
-def create_random_candidato(cc_persona):
+def create_random_candidato(cc_persona: str) -> Candidato:
     tipo = randint(1, 4)  # Assuming 4 types in master data
     return Candidato(cc_persona=cc_persona, id_tipo=tipo)
 
 
-def create_and_insert_candidatos(persona_ccs, n=5):
+def create_and_insert_candidatos(persona_ccs: List[str], n: int = 5) -> List[str]:
     candidatos = []
+    ccs = []
     for _ in range(n):
         candidato = create_random_candidato(choice(persona_ccs))
         candidato.crud().insert(candidato)
         candidatos.append(candidato)
-    return candidatos
+        ccs.append(candidato.cc_persona)
+    return ccs
 
 # --- LISTA ---
 
 
-def create_random_lista(partido_id, eleccion_id, tipo_eleccion_id):
+def create_random_lista(partido_id: int, eleccion_id: int) -> Lista:
     return Lista(
         valor=randint(1, 9999),
         id_partido=partido_id,
-        id_eleccion=eleccion_id,
-        id_tipo_eleccion=tipo_eleccion_id
+        id_eleccion=eleccion_id
     )
 
 
-def create_and_insert_listas(partido_ids, eleccion_ids, tipo_eleccion_ids, n=5):
-    listas = []
+def create_and_insert_listas(partido_ids: List[int], eleccion_ids: List[int], n: int = 5) -> List[tuple]:
+    pk_tuples = []
     for _ in range(n):
         lista = create_random_lista(
             choice(partido_ids),
-            choice(eleccion_ids),
-            choice(tipo_eleccion_ids)
+            choice(eleccion_ids)
         )
         lista.crud().insert(lista)
-        listas.append(lista)
-    return listas
+        pk_tuples.append((lista.valor, lista.id_partido, lista.id_eleccion))
+    return pk_tuples
 
 # --- VOTO ---
 
 
-def create_random_voto(lista, circuito_id):
+def create_random_voto(lista: Lista, circuito_id: int) -> Voto:
     fecha = fake.date_between(start_date='-5y', end_date='today')
     fecha_str = fecha.strftime('%Y-%m-%d')  # Convert to string
     return Voto(
@@ -356,7 +377,6 @@ def create_random_voto(lista, circuito_id):
         valor_lista=lista.valor,
         id_partido=lista.id_partido,
         id_eleccion=lista.id_eleccion,
-        id_tipo_eleccion=lista.id_tipo_eleccion,
         es_observado=fake.boolean(),
         id_tipo_voto=randint(1, 3),  # Assuming 3 types in master data
         id_circuito=circuito_id,
@@ -364,64 +384,38 @@ def create_random_voto(lista, circuito_id):
     )
 
 
-def create_and_insert_votos(listas, circuito_ids, n=10):
-    votos = []
+def create_and_insert_votos(listas: List[tuple], circuito_ids: List[int], n: int = 10) -> List[int]:
+    ids = []
     for _ in range(n):
-        lista = choice(listas)
-        voto = create_random_voto(lista, choice(circuito_ids))
+        valor, id_partido, id_eleccion = choice(listas)
+        lista_obj = Lista(valor=valor, id_partido=id_partido,
+                          id_eleccion=id_eleccion)
+        voto = create_random_voto(lista_obj, choice(circuito_ids))
         voto.crud().insert(voto)
-        votos.append(voto)
-    return votos
+        ids.append(voto.id)
+    return ids
 
 
 # --- CANDIDATO_LISTA ---
 
 
-def create_random_candidato_lista(cc_persona, lista):
+def create_random_candidato_lista(cc_persona: str, lista: Lista) -> CandidatoLista:
     return CandidatoLista(
         cc_persona=cc_persona,
         valor_lista=lista.valor,
         id_partido=lista.id_partido,
-        id_eleccion=lista.id_eleccion,
-        id_tipo_eleccion=lista.id_tipo_eleccion
+        id_eleccion=lista.id_eleccion
     )
 
 
-def create_and_insert_candidato_listas(persona_ccs, listas, n=5):
-    candidato_listas = []
+def create_and_insert_candidato_listas(persona_ccs: List[str], listas: List[tuple], n: int = 5) -> List[str]:
+    ccs = []
     for _ in range(n):
+        valor, id_partido, id_eleccion = choice(listas)
+        lista_obj = Lista(valor=valor, id_partido=id_partido,
+                          id_eleccion=id_eleccion)
         candidato_lista = create_random_candidato_lista(
-            choice(persona_ccs), choice(listas))
+            choice(persona_ccs), lista_obj)
         candidato_lista.crud().insert(candidato_lista)
-        candidato_listas.append(candidato_lista)
-    return candidato_listas
-
-
-# You can call these functions from a main or script section
-if __name__ == "__main__":
-    zonas = create_and_insert_zonas(5)
-    establecimientos = create_and_insert_establecimientos(zonas, 10)
-    personas = create_and_insert_personas(20)
-    partidos = create_and_insert_partidos(5)
-    elecciones = create_and_insert_elecciones(5)
-    circuitos = create_and_insert_circuitos(
-        [e.id for e in establecimientos], [z.id for z in zonas], [el.id for el in elecciones], [1, 2, 3, 4, 5], 10)
-    mesas = create_and_insert_mesas(
-        [c.id for c in circuitos], [p.cc for p in personas], [p.cc for p in personas], [p.cc for p in personas], 10)
-    votantes = create_and_insert_votantes(
-        [p.cc for p in personas], [c.id for c in circuitos], 10)
-    policias = create_and_insert_policias([p.cc for p in personas], [
-                                          e.id for e in establecimientos], [z.id for z in zonas], 5)
-    funcionarios = create_and_insert_funcionarios([p.cc for p in personas], 5)
-    presidentes = create_and_insert_presidentes(
-        [f.cc_persona for f in funcionarios], 2)
-    secretarios = create_and_insert_secretarios(
-        [f.cc_persona for f in funcionarios], 2)
-    vocales = create_and_insert_vocales(
-        [f.cc_persona for f in funcionarios], 2)
-    candidatos = create_and_insert_candidatos([p.cc for p in personas], 5)
-    listas = create_and_insert_listas([pa.id for pa in partidos], [
-                                      el.id for el in elecciones], [1, 2, 3, 4, 5], 5)
-    votos = create_and_insert_votos(listas, [c.id for c in circuitos], 10)
-    candidato_listas = create_and_insert_candidato_listas(
-        [p.cc for p in personas], listas, 5)
+        ccs.append(candidato_lista.cc_persona)
+    return ccs

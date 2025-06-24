@@ -1,14 +1,9 @@
-from model.Eleccion import Eleccion
-from model.ubicacion.Mesa import Mesa
-from model.ubicacion.Circuito import Circuito
-from model.ubicacion.Establecimiento import Establecimiento
-from model.ubicacion.Zona import Zona
-from model.personas.Persona import Persona
 import pytest
 from datetime import date
 from dotenv import load_dotenv
 import sys
 import os
+
 # Ensure backend/src is in sys.path for absolute imports
 sys.path.insert(0, os.path.abspath(
     os.path.join(os.path.dirname(__file__), '../')))
@@ -16,6 +11,14 @@ sys.path.insert(0, os.path.abspath(
 # Load test environment variables
 load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
 
+# Now import the model classes after path is set
+
+from model.Eleccion import Eleccion
+from model.ubicacion.Mesa import Mesa
+from model.ubicacion.Circuito import Circuito
+from model.ubicacion.Establecimiento import Establecimiento
+from model.ubicacion.Zona import Zona
+from model.personas.Persona import Persona
 
 # These tests use the homemade ORM and assume a test DB or mocks are in place.
 # They check that entities can be created and inserted without raising exceptions.
@@ -59,17 +62,17 @@ def test_basic_entities_working():
     zona = Zona(test_id, "TestParaje", "TestCiudad",
                 "TestDepto", "TestMunicipio")
     zona_result = zona.crud().insert(zona)
-    assert zona_result is True, "Failed to insert Zona"
+    assert zona_result is zona, "Failed to insert Zona"
 
     # 2. Persona insertion (works)
     persona = Persona(f"ZZZ {test_id}", test_id, "Test Nombre", "2000-01-01")
     persona_result = persona.crud().insert(persona)
-    assert persona_result is True, "Failed to insert Persona"
+    assert persona_result is persona, "Failed to insert Persona"
 
     # 3. Eleccion insertion (works if TipoEleccion exists)
     eleccion = Eleccion(test_id, date(2030, 1, 1), 1)  # assumes tipo 1 exists
     eleccion_result = eleccion.crud().insert(eleccion)
-    assert eleccion_result is True, "Failed to insert Eleccion"
+    assert eleccion_result is eleccion, "Failed to insert Eleccion"
 
     # 4. Establecimiento insertion (works with proper JSON direccion)
     direccion_json = json.dumps({
@@ -82,12 +85,12 @@ def test_basic_entities_working():
     establecimiento = Establecimiento(
         test_id, "TestTipo", direccion_json, test_id)
     estab_result = establecimiento.crud().insert(establecimiento)
-    assert estab_result is True, "Failed to insert Establecimiento"
+    assert estab_result is establecimiento, "Failed to insert Establecimiento"
 
     # 5. Circuito insertion (depends on Establecimiento, Zona, Eleccion, TipoEleccion)
     circuito = Circuito(test_id, True, test_id, test_id, test_id, 1)
     circuito_result = circuito.crud().insert(circuito)
-    assert circuito_result is True, "Failed to insert Circuito"
+    assert circuito_result is circuito, "Failed to insert Circuito"
 
     print(
         f"Core entities (Zona, Persona, Eleccion, Establecimiento, Circuito) inserted successfully with test_id: {test_id}!")
@@ -98,17 +101,3 @@ def test_basic_entities_working():
     print("All entities inserted successfully in dependency order!")
 
 
-@pytest.mark.integration
-def test_simple_zona_insert():
-    """Test just Zona insertion (no dependencies)"""
-    zona = Zona(777, "SimpleTest", "SimpleCity", "SimpleDepto", "SimpleMuni")
-    result = zona.crud().insert(zona)
-    assert result is True, "Failed to insert simple Zona"
-
-
-@pytest.mark.integration
-def test_simple_persona_insert():
-    """Test just Persona insertion (no dependencies)"""
-    persona = Persona("YYY 7777", 77777777, "Simple Test", "1995-05-05")
-    result = persona.crud().insert(persona)
-    assert result is True, "Failed to insert simple Persona"

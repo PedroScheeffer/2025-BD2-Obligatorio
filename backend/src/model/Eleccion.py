@@ -14,7 +14,7 @@ class Eleccion(BaseEntity):
     values_needed = ["id", "fecha", "id_tipo_eleccion"]
     primary_key = "id"
 
-    def __init__(self, id: int, fecha: str, id_tipo_eleccion: int):
+    def __init__(self, id: int | None, fecha: str, id_tipo_eleccion: int):
         self.id = id
         self.fecha = fecha  # Store as string in YYYY-MM-DD format
         self.id_tipo_eleccion = id_tipo_eleccion

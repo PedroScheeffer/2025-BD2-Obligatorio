@@ -1,9 +1,12 @@
+from random import choice
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 import uvicorn
 from contextlib import asynccontextmanager
-
+from services.orm_casero.MySQLScriptRunner import MySQLScriptRunner
+import sys
+import time
 
 # RUTAS.
 from routes import router
@@ -26,34 +29,61 @@ from utils.DataCreator import (
     create_and_insert_candidatos,
     create_and_insert_listas,
     create_and_insert_votos,
-    create_and_insert_candidato_listas
+    create_and_insert_candidato_listas,
+    create_random_lista
 )
 
-
+from config.logger import logger
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Only for dev/demo! Remove or guard for production!
-    zonas = create_and_insert_zonas(5)
-    establecimientos = create_and_insert_establecimientos(zonas, 10)
-    personas = create_and_insert_personas(20)
-    partidos = create_and_insert_partidos(5)
-    elecciones = create_and_insert_elecciones(2)
-    cant_circuito_mesas = 10
+    # Wait for DB connection before any inserts
+    max_attempts = 10
+    attempt = 0
+    while attempt < max_attempts:
+        if MySQLScriptRunner.get_database_connection_status():
+            break
+        logger.warning(
+            f"Waiting for database to be online... (attempt {attempt+1}/{max_attempts})")
+        attempt += 1
+        time.sleep(2 * attempt)  # Exponential backoff
+    else:
+        print("ERROR: Database is not available after waiting. Exiting app startup.")
+        sys.exit(1)
+
+    zonas = create_and_insert_zonas(5)  # List[int]
+    establecimientos = create_and_insert_establecimientos(
+        zonas, 10)  # List[int]
+    personas = create_and_insert_personas(20)  # List[str]
+    partidos = create_and_insert_partidos(5)  # List[int]
+    elecciones = create_and_insert_elecciones(5)  # List[int]
     circuitos = create_and_insert_circuitos(
-        establecimientos, zonas, elecciones, [1, 2, 3, 4, 5], cant_circuito_mesas)
+        establecimientos, elecciones, [1, 2, 3, 4, 5], 10)  # List[int]
     mesas = create_and_insert_mesas(
-        circuitos, personas, personas, personas, cant_circuito_mesas)
-    votantes = create_and_insert_votantes(personas, circuitos, 10)
-    policias = create_and_insert_policias(personas, establecimientos, zonas, 5)
-    funcionarios = create_and_insert_funcionarios(personas, 5)
-    presidentes = create_and_insert_presidentes(funcionarios, 2)
-    secretarios = create_and_insert_secretarios(funcionarios, 2)
-    vocales = create_and_insert_vocales(funcionarios, 2)
-    candidatos = create_and_insert_candidatos(personas, 5)
-    listas = create_and_insert_listas(
-        partidos, elecciones, [1, 2, 3, 4, 5], 5)
-    votos = create_and_insert_votos(listas, circuitos, 10)
-    candidato_listas = create_and_insert_candidato_listas(personas, listas, 5)
+        circuitos, personas, personas, personas, 10)  # List[int]
+    votantes = create_and_insert_votantes(
+        personas, circuitos, 10)  # List[str]
+    policias = create_and_insert_policias(
+        personas, establecimientos, 5)  # List[str]
+    funcionarios = create_and_insert_funcionarios(personas, 5)  # List[str]
+    presidentes = create_and_insert_presidentes(
+        funcionarios, 2)  # List[str]
+    secretarios = create_and_insert_secretarios(
+        funcionarios, 2)  # List[str]
+    vocales = create_and_insert_vocales(
+        funcionarios, 2)  # List[str]
+    candidatos = create_and_insert_candidatos(personas, 5)  # List[str]
+    # Create Lista objects and their IDs
+    lista_objs = []
+    for _ in range(5):
+        lista = create_random_lista(choice(partidos), choice(elecciones))
+        lista.crud().insert(lista)
+        lista_objs.append(lista)
+    listas_tuples = [(l.valor, l.id_partido, l.id_eleccion)
+                     for l in lista_objs]
+    votos = create_and_insert_votos(listas_tuples, circuitos, 10)  # List[int]
+    candidato_listas = create_and_insert_candidato_listas(
+        personas, listas_tuples, 5)  # List[str]
+
     yield
 
 
