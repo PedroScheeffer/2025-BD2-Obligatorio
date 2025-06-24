@@ -110,5 +110,35 @@ class PersonaService:
 
         return {"message": "Persona deleted successfully"}
     
+    @staticmethod
+    def login(cc: str, contrasena: str, rol: str):
+        conn = mysql.connector.connect(**DB_CONFIG)
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute("SELECT * FROM PERSONA WHERE cc = %s", (cc,))
+        persona = cursor.fetchone()
+
+        if not persona:
+            raise Exception("Credencial no registrada")
+
+        if contrasena != cc:
+            raise Exception("Contraseña inválida")
+
+        if rol == "votante":
+            cursor.execute("SELECT 1 FROM VOTANTE WHERE cc_persona = %s", (cc,))
+            if cursor.fetchone():
+                return {"rol": rol, "persona": persona, "id_circuito": votante["id_circuito"]}
+            else:
+                raise Exception("La persona no es votante")
+
+        elif rol == "funcionario":
+            cursor.execute("SELECT 1 FROM FUNCIONARIO WHERE cc_persona = %s", (cc,))
+            if cursor.fetchone():
+                return {"rol": rol, "persona": persona}
+            else:
+                raise Exception("La persona no es funcionario")
+
+        else:
+            raise Exception("Rol inválido")
 
         

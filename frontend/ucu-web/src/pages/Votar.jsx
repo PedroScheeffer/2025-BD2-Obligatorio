@@ -2,17 +2,12 @@ import { Typography, FormGroup, FormControlLabel, Checkbox, Button, Box } from "
 import { useState } from "react";
 import FormContainer from "../components/FormContainer";
 
-const opciones = [
-  "Lista 1 - Partido A",
-  "Lista 2 - Partido B",
-  "Lista 3 - Partido A",
-  "Blanco",
-  "Anulado"
-];
-
 const Votar = () => {
   const [seleccionado, setSeleccionado] = useState("");
   const [opciones, setOpciones] = useState([]);
+
+  const cc = localStorage.getItem("cc");
+  const id_circuito = localStorage.getItem("id_circuito");
 
   useEffect(() => {
     fetch("http://localhost:8000/opciones-voto") 
@@ -40,7 +35,7 @@ const Votar = () => {
       id_eleccion: seleccionado.id_eleccion,
       id_tipo_eleccion: seleccionado.id_tipo_eleccion,
       id_tipo_voto: seleccionado.id_tipo_voto,
-      id_circuito: id_circuito,
+      id_circuito: parseInt(id_circuito),
       fecha: new Date().toISOString().split("T")[0],
       es_observado: false,
       cc_persona: cc, 

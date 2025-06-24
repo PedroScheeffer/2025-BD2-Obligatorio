@@ -77,3 +77,32 @@ async def delete_persona(cc: str, headers: dict = Depends(get_auth_headers)):
         logging.error(f"Error deleting persona with CC {cc}: {e}")
         raise HTTPException(status_code=400, detail=str(e))
 
+@router.post("/login")
+async def login(request: Request):
+    data = await request.json()
+    cc = data.get("credencial")
+    contrasena = data.get("contrasena")
+    rol = data.get("rol")
+
+    try:
+        result = PersonaService.login(cc, contrasena, rol)
+        return result
+    except Exception as e:
+        logging.error(f"Error en login con cc={cc}, rol={rol}: {e}")
+        raise HTTPException(status_code=401, detail=str(e))
+    
+@router.get("/opciones-voto")
+async def obtener_opciones_voto():
+    try:
+        opciones = VotoService.obtener_opciones()
+        return opciones
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error obteniendo opciones: {e}")
+    
+@router.post("/votos")
+async def registrar_voto(voto_data: dict):
+    try:
+        resultado = VotoService.registrar_voto(voto_data)
+        return {"message": "Voto registrado con éxito"}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error al registrar voto: {e}")
