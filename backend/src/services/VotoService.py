@@ -1,11 +1,11 @@
 import mysql.connector
-from config import DB_CONFIG
+from config.db import get_connection
 from datetime import date
 
 class VotoService:
     @staticmethod
     def obtener_opciones():
-        conn = mysql.connector.connect(**DB_CONFIG)
+        conn = get_connection()
         cursor = conn.cursor(dictionary=True)
 
         hoy = date.today()
@@ -20,11 +20,14 @@ class VotoService:
             FROM LISTA l
             JOIN PARTIDO p ON l.id_partido = p.id
             JOIN ELECCION e ON l.id_eleccion = e.id
-            WHERE e.fecha = %s
+            WHERE e.fecha = '2025-06-25'
         """
 
-        cursor.execute(query, (hoy,))
+        cursor.execute(query)
         resultados = cursor.fetchall()
+
+        if not resultados:
+            return []  
 
         opciones = []
 
@@ -38,29 +41,29 @@ class VotoService:
                 "id_tipo_voto": 1  # válido
             })
 
-            opciones.append({
-                "valor_lista": 0,
-                "id_partido": 0,
-                "id_eleccion": resultados[0]["id_eleccion"] if resultados else 1,
-                "id_tipo_eleccion": resultados[0]["id_tipo_eleccion"] if resultados else 1,
-                "label": "Blanco",
-                "id_tipo_voto": 2  # blanco
-            })
+        opciones.append({
+            "valor_lista": 0,
+            "id_partido": 0,
+            "id_eleccion": resultados[0]["id_eleccion"] if resultados else 1,
+            "id_tipo_eleccion": resultados[0]["id_tipo_eleccion"] if resultados else 1,
+            "label": "Blanco",
+            "id_tipo_voto": 2  # blanco
+        })
 
-            opciones.append({
-                "valor_lista": 0,
-                "id_partido": 0,
-                "id_eleccion": resultados[0]["id_eleccion"] if resultados else 1,
-                "id_tipo_eleccion": resultados[0]["id_tipo_eleccion"] if resultados else 1,
-                "label": "Anulado",
-                "id_tipo_voto": 3  # anulado
-            })
+        opciones.append({
+            "valor_lista": 0,
+            "id_partido": 0,
+            "id_eleccion": resultados[0]["id_eleccion"] if resultados else 1,
+            "id_tipo_eleccion": resultados[0]["id_tipo_eleccion"] if resultados else 1,
+            "label": "Anulado",
+            "id_tipo_voto": 3  # anulado
+        })
 
         return opciones
 
     @staticmethod
     def registrar_voto(data):
-        conn = mysql.connector.connect(**DB_CONFIG)
+        conn = get_connection()
         cursor = conn.cursor(dictionary=True)
 
         cursor.execute("SELECT voto, id_circuito FROM VOTANTE WHERE cc_persona = %s", (data["cc_persona"],))

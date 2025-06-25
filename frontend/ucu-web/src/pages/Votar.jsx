@@ -1,5 +1,5 @@
 import { Typography, FormGroup, FormControlLabel, Checkbox, Button, Box } from "@mui/material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import FormContainer from "../components/FormContainer";
 
 const Votar = () => {
@@ -10,7 +10,7 @@ const Votar = () => {
   const id_circuito = localStorage.getItem("id_circuito");
 
   useEffect(() => {
-    fetch("http://localhost:8000/opciones-voto") 
+    fetch("http://localhost:8000/api/opciones-voto") 
       .then((res) => res.json())
       .then((data) => setOpciones(data))
       .catch((err) => {
@@ -42,7 +42,7 @@ const Votar = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:8000/votos", {
+      const response = await fetch("http://localhost:8000/api/votos", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -61,8 +61,8 @@ const Votar = () => {
     <FormContainer>
       <Typography variant="h5" gutterBottom align="center">VOTAR</Typography>
       <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-        <FormGroup >
-        {opciones.map((op) => (
+      <FormGroup>
+        {Array.isArray(opciones) && opciones.map((op) => (
           <FormControlLabel
             key={op.label}
             control={

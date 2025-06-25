@@ -14,10 +14,16 @@ function App() {
 
   const handleLogin = (selectedRol, data) => {
     setRol(selectedRol);
-      setIsLoggedIn(true);
-      setPersona(data.persona); 
+    setIsLoggedIn(true);
+    setPersona(data.persona); 
 
-      console.log("Usuario logueado:", data.persona);
+    if (selectedRol === "funcionario") {
+      setCurrentPage("funcionarioLayout"); 
+    } else if (selectedRol === "votante") {
+      setCurrentPage("votar");
+    }
+
+    console.log("Usuario logueado:", data.persona);
   };
 
   return (
@@ -27,9 +33,13 @@ function App() {
         <Login onLogin={handleLogin} />
       ) : rol === "funcionario" ? (
         <Layout currentPage={currentPage} setCurrentPage={setCurrentPage} />
+      ) : currentPage === "votar" ? (
+        <Box sx={{ p: 4 }}>
+          <Votar persona={persona} />
+        </Box>
       ) : (
         <Box sx={{ p: 4 }}>
-          <Votar persona={persona}/>
+          <div>Cargando...</div>
         </Box>
       )}
     </Box>

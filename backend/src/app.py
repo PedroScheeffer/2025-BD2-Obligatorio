@@ -1,5 +1,5 @@
 from random import choice
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 import uvicorn
@@ -95,6 +95,12 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    print(f"Request path: {request.url.path}")
+    response = await call_next(request)
+    return response
+
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
@@ -110,6 +116,8 @@ logging.basicConfig(level=logging.DEBUG)
 # Registro de las rutas
 app.include_router(router, prefix="/api")
 
+for route in app.routes:
+    print(f"Ruta: {route.path} | métodos: {route.methods}")
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=5000)

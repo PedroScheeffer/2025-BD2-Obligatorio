@@ -10,6 +10,8 @@ from model.personas.Vocal import Vocal, VocalSchema
 from model.personas.Votante import Votante, VotanteSchema
 from enum import Enum
 
+from config.db import get_connection
+
 # Esta clase se encarga de persona y sus genericaciones
 class PersonaRol(str, Enum):
     CANDIDATO = "Candidato"
@@ -112,7 +114,10 @@ class PersonaService:
     
     @staticmethod
     def login(cc: str, contrasena: str, rol: str):
-        conn = mysql.connector.connect(**DB_CONFIG)
+        conn = get_connection()
+        if not conn:
+            raise Exception("No se pudo conectar a la base de datos")
+
         cursor = conn.cursor(dictionary=True)
 
         cursor.execute("SELECT * FROM PERSONA WHERE cc = %s", (cc,))
@@ -125,8 +130,9 @@ class PersonaService:
             raise Exception("Contraseña inválida")
 
         if rol == "votante":
-            cursor.execute("SELECT 1 FROM VOTANTE WHERE cc_persona = %s", (cc,))
-            if cursor.fetchone():
+            cursor.execute("SELECT * FROM VOTANTE WHERE cc_persona = %s", (cc,))
+            votante = cursor.fetchone()
+            if votante:
                 return {"rol": rol, "persona": persona, "id_circuito": votante["id_circuito"]}
             else:
                 raise Exception("La persona no es votante")

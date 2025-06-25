@@ -1,10 +1,10 @@
-from config.db_config import DB_CONFIG
+from config.db import get_connection
 import mysql.connector
 
 class ResultadosService:
     @staticmethod
     def obtener_resultados(categoria: str):
-        conn = mysql.connector.connect(**DB_CONFIG)
+        conn = mysql.connector.connect(**get_connection)
         cursor = conn.cursor(dictionary=True)
 
         if categoria == "circuito":

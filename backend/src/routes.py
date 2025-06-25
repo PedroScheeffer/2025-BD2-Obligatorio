@@ -1,10 +1,12 @@
-from fastapi import APIRouter, HTTPException, Header, Depends
+from fastapi import APIRouter, HTTPException, Header, Depends, Request
 from typing import Optional
 import logging
 
 # servicios.
 from model.personas.Persona import PersonaSchema
 from services.PersonaService import PersonaService
+from services.VotoService import VotoService
+from services.ResultadoService import ResultadosService
 
 # MODEL PARA CHECKEAR CONEXIÓN A LA BASE DE DATOS.
 from services.orm_casero.MySQLScriptRunner import MySQLScriptRunner
@@ -92,11 +94,12 @@ async def login(request: Request):
         raise HTTPException(status_code=401, detail=str(e))
     
 @router.get("/opciones-voto")
-async def obtener_opciones_voto():
+async def obtener_opciones():
     try:
         opciones = VotoService.obtener_opciones()
         return opciones
     except Exception as e:
+        print("Error en obtener_opciones_voto:", str(e))
         raise HTTPException(status_code=500, detail=f"Error obteniendo opciones: {e}")
     
 @router.post("/votos")
