@@ -106,3 +106,12 @@ async def registrar_voto(voto_data: dict):
         return {"message": "Voto registrado con éxito"}
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Error al registrar voto: {e}")
+
+@router.get("/resultados/{categoria}")
+def get_resultados(categoria: str):
+    try:
+        return ResultadosService.obtener_resultados(categoria)
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Error al obtener resultados")
