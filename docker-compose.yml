@@ -5,7 +5,7 @@ services:
       dockerfile: ../Dockerfile
     container_name: frontend_votos
     ports:
-      - "5173:5173"
+      - "80:5173"
     depends_on:
       - app
     volumes:
@@ -30,12 +30,33 @@ services:
     volumes:
       - ./backend/src:/src
 
+    depends_on:
+      - db
+
     networks:
       - ucu_network
 
+  db:
+    image: mysql:8.0
+    container_name: db_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: IC_Grupo3
+      MYSQL_USER: presi
+      MYSQL_PASSWORD: votosecreto
+    ports:
+      - "3306:3306"
+
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./scripts:/docker-entrypoint-initdb.d
+      
+    networks:
+      - ucu_network
 
 volumes:
   node_modules_volume:
+  db_data:
 
 networks:
   ucu_network:

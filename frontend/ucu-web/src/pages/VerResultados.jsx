@@ -1,12 +1,22 @@
 import React, { useState } from "react";
-import { Typography, Box, Select, MenuItem, FormControl, InputLabel } from "@mui/material";
+import { Typography, Box, Select, MenuItem, FormControl, InputLabel, Table, TableBody, TableCell, TableHead, TableRow, Paper } from "@mui/material";
 import FormContainer from "../components/FormContainer";
 
 const VerResultados = ({ tipo }) => {
   const [categoria, setCategoria] = useState("");
+  const [resultados, setResultados] = useState([]);
 
-  const handleChange = (event) => {
-    setCategoria(event.target.value);
+  const handleChange = async (event) => {
+    const selected = event.target.value;
+    setCategoria(selected);
+
+    try {
+      const res = await fetch(`http://localhost:8000/api/resultados/${selected}`);
+      const data = await res.json();
+      setResultados(data);
+    } catch (err) {
+      console.error("Error al obtener resultados:", err);
+    }
   };
 
   const opcionesPorTipo = {
@@ -44,9 +54,30 @@ const VerResultados = ({ tipo }) => {
         </FormControl>
       </Box>
 
-      {categoria && (
+      {categoria && resultados.length > 0 && (
         <Box sx={{ mt: 4 }}>
+<<<<<<< HEAD
           {/* contenido según categoría seleccionada */}
+=======
+          <Paper>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>{categoria.toUpperCase()}</TableCell>
+                  <TableCell>Votos</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {resultados.map((item, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{Object.values(item)[0]}</TableCell>
+                    <TableCell>{Object.values(item)[1]}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Paper>
+>>>>>>> 361c5296bd1db0062737fe44a32b524a5e989dc7
         </Box>
       )}
     </FormContainer>

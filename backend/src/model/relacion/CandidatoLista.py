@@ -17,9 +17,8 @@ class CandidatoLista(BaseEntity):
                      "id_partido", "id_eleccion", "id_tipo_eleccion"]
     primary_key = "cc_persona"  # O una tupla para clave compuesta si lo deseas
 
-    def __init__(self, cc_persona: str, valor_lista: int, id_partido: int, id_eleccion: int, id_tipo_eleccion: int):
+    def __init__(self, cc_persona: str, valor_lista: int, id_partido: int, id_eleccion: int):
         self.cc_persona = cc_persona
         self.valor_lista = valor_lista
         self.id_partido = id_partido
         self.id_eleccion = id_eleccion
-        self.id_tipo_eleccion = id_tipo_eleccion

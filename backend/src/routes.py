@@ -1,10 +1,12 @@
-from fastapi import APIRouter, HTTPException, Header, Depends
+from fastapi import APIRouter, HTTPException, Header, Depends, Request
 from typing import Optional
 import logging
 
 # servicios.
 from model.personas.Persona import PersonaSchema
 from services.PersonaService import PersonaService
+from services.VotoService import VotoService
+from services.ResultadoService import ResultadosService
 
 # MODEL PARA CHECKEAR CONEXIÓN A LA BASE DE DATOS.
 from services.orm_casero.MySQLScriptRunner import MySQLScriptRunner
@@ -82,8 +84,8 @@ async def delete_persona(cc: str, headers: dict = Depends(get_auth_headers)):
         logging.error(f"Error deleting persona with CC {cc}: {e}")
         raise HTTPException(status_code=400, detail=str(e))
 
-from services.CircuitoService import CircuitoService  # Asegurate de importar correctamente
-
+from services.CircuitoService import CircuitoService  #
+ Asegurate de importar correctamente
 @router.post("/circuitos")
 async def registrar_circuito(circuito_data: dict):
     try:
@@ -126,3 +128,43 @@ async def registrar_candidato(candidato_data: dict):
             raise HTTPException(status_code=500, detail="No se pudo registrar el candidato")
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+@router.post("/login")
+async def login(request: Request):
+    data = await request.json()
+    cc = data.get("credencial")
+    contrasena = data.get("contrasena")
+    rol = data.get("rol")
+
+    try:
+        result = PersonaService.login(cc, contrasena, rol)
+        return result
+    except Exception as e:
+        logging.error(f"Error en login con cc={cc}, rol={rol}: {e}")
+        raise HTTPException(status_code=401, detail=str(e))
+    
+@router.get("/opciones-voto/{id_tipo_eleccion}")
+async def obtener_opciones(id_tipo_eleccion: int):
+    try:
+        opciones = VotoService.obtener_opciones(id_tipo_eleccion)
+        return opciones
+    except Exception as e:
+        print("Error en obtener_opciones_voto:", str(e))
+        raise HTTPException(status_code=500, detail=f"Error obteniendo opciones: {e}")
+    
+@router.post("/votos")
+async def registrar_voto(voto_data: dict):
+    try:
+        resultado = VotoService.registrar_voto(voto_data)
+        return {"message": "Voto registrado con éxito"}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error al registrar voto: {e}")
+
+@router.get("/resultados/{categoria}")
+def get_resultados(categoria: str):
+    try:
+        return ResultadosService.obtener_resultados(categoria)
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
+    except Exception as e:
+        print("Error en get_resultados:", str(e))
+        raise HTTPException(status_code=500, detail="Error al obtener resultados")

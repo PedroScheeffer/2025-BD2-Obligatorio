@@ -15,8 +15,8 @@ class Lista(BaseEntity):
     values_needed = ["valor", "id_partido", "id_eleccion", "id_tipo_eleccion"]
     primary_key = "valor"  # Puede requerir clave compuesta
 
-    def __init__(self, valor: int, id_partido: int, id_eleccion: int, id_tipo_eleccion: int):
+    def __init__(self, valor: int, id_partido: int, id_eleccion: int):
         self.valor = valor
         self.id_partido = id_partido
         self.id_eleccion = id_eleccion
-        self.id_tipo_eleccion = id_tipo_eleccion
+

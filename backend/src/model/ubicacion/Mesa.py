@@ -24,7 +24,7 @@ class Mesa(BaseEntity):
         "cc_presidente"
     ]
 
-    def __init__(self, id: int, id_circuito: int, cc_vocal: str, cc_secretario: str, cc_presidente: str):
+    def __init__(self, id: int | None, id_circuito: int, cc_vocal: str, cc_secretario: str, cc_presidente: str):
         self.id = id
         self.id_circuito = id_circuito
         self.cc_vocal = cc_vocal

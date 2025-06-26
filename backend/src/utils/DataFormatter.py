@@ -1,25 +1,29 @@
 from datetime import timedelta, date
+import json
+
+from model.schemas.Direccion import DireccionSchema
+
 
 class DataFormatter:
     """
         Clase auxiliar para formatear data de una lista de diccionarios (representación de registros de la base de datos) a un formato legible.
-        
+
         Nota: Por ahora hace formateo de fechas. (timedelta o date -> YYYY-MM-SS)
-        
+
         Estado: clase terminada.
     """
-    
+
     @staticmethod
     def __timedelta_to_HMS(tdelta: timedelta) -> str:
         """
             Convierte un objeto timedelta a una cadena con el formato HH:MM:SS.
-                
+
             Entrada:
                 - `tdelta`: el objeto timedelta a convertir.
-                
+
             Salida:
                 - una cadena con el formato HH:MM:SS.
-                
+
             Estado: método completado.
         """
         total_seconds = int(tdelta.total_seconds())
@@ -32,13 +36,13 @@ class DataFormatter:
     def __date_to_string(dateObj: date) -> str:
         """
             Convierte un objeto de tipo date a una cadena con el formato YYYY-MM-DD.
-            
+
             Entrada:
                 - `dateObj`: el objeto date a convertir.
-            
+
             Salida:
                 - Una cadena con el formato YYYY-MM-DD.
-                
+
             Estado: método completado.
         """
         return dateObj.strftime("%Y-%m-%d")
@@ -49,13 +53,13 @@ class DataFormatter:
             Recorre una lista de diccionarios (representación de registros de la base de datos) y
             convierte los valores de tipo timedelta y date a sus formatos correspondientes:
             HH:MM:SS para timedelta y YYYY-MM-DD para date.
-            
+
             Entrada:
                 - `data`: Lista de diccionarios con los datos a formatear.
-            
+
             Salida:
                 Lista de diccionarios con los datos formateados.
-                
+
             Estado: método completado, ya que además de las fechas o tiempos, no hay otra data a formatear.
         """
         if (data is not None):
@@ -66,3 +70,19 @@ class DataFormatter:
                     elif isinstance(value, date):  # Si es una fecha
                         record[key] = DataFormatter.__date_to_string(value)
         return data
+
+    @staticmethod
+    def format_direccion(direccion: DireccionSchema) -> str:
+        """
+            Formatea un diccionario de dirección a una cadena JSON.
+
+            Entrada:
+                - `direccion`: Diccionario con los campos de dirección.
+
+            Salida:
+                - Cadena JSON representando la dirección.
+
+            Estado: método completado.
+        """
+
+        return json.dumps(direccion)
