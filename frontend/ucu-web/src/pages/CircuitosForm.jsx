@@ -18,10 +18,11 @@ const CircuitosForm = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          establecimiento,
-          mesa,
-          accesibilidad,
-          integrantes,
+          id_establecimiento: parseInt(establecimiento),
+          id_zona: 1, 
+          id_eleccion: 1, 
+          id_tipo_eleccion: 1, 
+          accesibilidad: accesibilidad.toLowerCase() === "sí" || accesibilidad.toLowerCase() === "si"
         }),
       });
 

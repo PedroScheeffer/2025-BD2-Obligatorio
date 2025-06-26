@@ -9,6 +9,11 @@ from services.PersonaService import PersonaService
 # MODEL PARA CHECKEAR CONEXIÓN A LA BASE DE DATOS.
 from services.orm_casero.MySQLScriptRunner import MySQLScriptRunner
 
+from services.CircuitoService import CircuitoService
+from services.ListaService import ListaService
+from services.EleccionesService import EleccionesService
+from services.CandidatoService import CandidatoService
+
 # Crea un router para organizar las rutas
 router = APIRouter()
 
@@ -77,3 +82,47 @@ async def delete_persona(cc: str, headers: dict = Depends(get_auth_headers)):
         logging.error(f"Error deleting persona with CC {cc}: {e}")
         raise HTTPException(status_code=400, detail=str(e))
 
+from services.CircuitoService import CircuitoService  # Asegurate de importar correctamente
+
+@router.post("/circuitos")
+async def registrar_circuito(circuito_data: dict):
+    try:
+        exito = CircuitoService.registrar_circuito(circuito_data)
+        if exito:
+            return {"message": "Circuito registrado correctamente"}
+        else:
+            raise HTTPException(status_code=500, detail="No se pudo registrar el circuito")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.post("/listas")
+async def crear_lista(data: dict):
+    from services.ListaService import ListaService
+    if ListaService.registrar_lista(data):
+        return {"message": "Lista registrada exitosamente"}
+    else:
+        raise HTTPException(status_code=400, detail="Error al registrar la lista")
+
+
+@router.post("/elecciones")
+async def crear_eleccion(data: dict):
+    try:
+        exito = EleccionesService.registrar_eleccion(data)
+        if exito:
+            return {"message": "Elección registrada correctamente"}
+        else:
+            raise HTTPException(status_code=500, detail="No se pudo registrar la elección")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.post("/candidatos")
+async def registrar_candidato(candidato_data: dict):
+    try:
+        exito = CandidatoService.registrar_candidato(candidato_data)
+        if exito:
+            return {"message": "Candidato registrado correctamente"}
+        else:
+            raise HTTPException(status_code=500, detail="No se pudo registrar el candidato")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))

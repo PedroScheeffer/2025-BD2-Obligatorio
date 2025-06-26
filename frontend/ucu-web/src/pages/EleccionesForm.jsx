@@ -69,7 +69,7 @@ const EleccionesForm = () => {
         />
 
         <Box sx={{ display: "flex", justifyContent: "space-around", mt: 2 }}>
-          <Button type="submit" variant="contained" color="success">
+          <Button variant="contained" color="success" onClick={handleSubmit}>
             Aceptar
           </Button>
           <Button
