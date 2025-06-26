@@ -93,10 +93,10 @@ async def login(request: Request):
         logging.error(f"Error en login con cc={cc}, rol={rol}: {e}")
         raise HTTPException(status_code=401, detail=str(e))
     
-@router.get("/opciones-voto")
-async def obtener_opciones():
+@router.get("/opciones-voto/{id_tipo_eleccion}")
+async def obtener_opciones(id_tipo_eleccion: int):
     try:
-        opciones = VotoService.obtener_opciones()
+        opciones = VotoService.obtener_opciones(id_tipo_eleccion)
         return opciones
     except Exception as e:
         print("Error en obtener_opciones_voto:", str(e))
@@ -117,4 +117,5 @@ def get_resultados(categoria: str):
     except ValueError as ve:
         raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
+        print("Error en get_resultados:", str(e))
         raise HTTPException(status_code=500, detail="Error al obtener resultados")

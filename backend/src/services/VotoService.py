@@ -4,11 +4,11 @@ from datetime import date
 
 class VotoService:
     @staticmethod
-    def obtener_opciones():
+    def obtener_opciones(id_tipo_eleccion):
         conn = get_connection()
         cursor = conn.cursor(dictionary=True)
 
-        hoy = date.today()
+        hoy = date.today().strftime('%Y-%m-%d')
 
         query = """
             SELECT 
@@ -20,11 +20,14 @@ class VotoService:
             FROM LISTA l
             JOIN PARTIDO p ON l.id_partido = p.id
             JOIN ELECCION e ON l.id_eleccion = e.id
-            WHERE e.fecha = '2025-06-25'
+            WHERE DATE(e.fecha) = %s AND e.id_tipo_eleccion = %s
         """
 
-        cursor.execute(query)
+        cursor.execute(query, (hoy, id_tipo_eleccion))
         resultados = cursor.fetchall()
+
+        print("Consulta ejecutada con fecha:", hoy) # cuando es muy tarde toma el hoy como el próximo día
+        print("Resultados obtenidos:", resultados)
 
         if not resultados:
             return []  

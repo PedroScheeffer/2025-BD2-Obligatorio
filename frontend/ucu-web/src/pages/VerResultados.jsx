@@ -11,7 +11,7 @@ const VerResultados = ({ tipo }) => {
     setCategoria(selected);
 
     try {
-      const res = await fetch(`http://localhost:8000/resultados/${selected}`);
+      const res = await fetch(`http://localhost:8000/api/resultados/${selected}`);
       const data = await res.json();
       setResultados(data);
     } catch (err) {

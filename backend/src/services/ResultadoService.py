@@ -4,7 +4,7 @@ import mysql.connector
 class ResultadosService:
     @staticmethod
     def obtener_resultados(categoria: str):
-        conn = mysql.connector.connect(**get_connection)
+        conn = get_connection()
         cursor = conn.cursor(dictionary=True)
 
         if categoria == "circuito":
@@ -24,7 +24,7 @@ class ResultadosService:
             """
         elif categoria == "lista":
             query = """
-                SELECT CONCAT(valor_lista, '-', id_partido) AS nombre, COUNT(*) AS votos
+                SELECT CONCAT(valor_lista) AS nombre, COUNT(*) AS votos
                 FROM VOTO
                 GROUP BY valor_lista, id_partido
             """

@@ -10,7 +10,8 @@ const Votar = () => {
   const id_circuito = localStorage.getItem("id_circuito");
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/opciones-voto") 
+    const idTipoEleccion = 1;
+    fetch(`http://localhost:8000/api/opciones-voto/${idTipoEleccion}`) 
       .then((res) => res.json())
       .then((data) => setOpciones(data))
       .catch((err) => {
