@@ -56,28 +56,7 @@ const VerResultados = ({ tipo }) => {
 
       {categoria && resultados.length > 0 && (
         <Box sx={{ mt: 4 }}>
-<<<<<<< HEAD
           {/* contenido según categoría seleccionada */}
-=======
-          <Paper>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>{categoria.toUpperCase()}</TableCell>
-                  <TableCell>Votos</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {resultados.map((item, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{Object.values(item)[0]}</TableCell>
-                    <TableCell>{Object.values(item)[1]}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </Paper>
->>>>>>> 361c5296bd1db0062737fe44a32b524a5e989dc7
         </Box>
       )}
     </FormContainer>

@@ -1,38 +1,36 @@
-import { Typography, TextField, Button, Box, MenuItem } from "@mui/material";
+import { Box, Typography, TextField, Button, MenuItem } from "@mui/material";
 import FormContainer from "../components/FormContainer";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const ListaForm = () => {
   const [numero, setNumero] = useState("");
-  const [partido, setPartido] = useState("");
-  const [candidatos, setCandidatos] = useState("");
+  const [partidoSeleccionado, setPartidoSeleccionado] = useState("");
   const [idEleccion, setIdEleccion] = useState("");
-  const [tipo, setTipo] = useState("");
+  const [candidatos, setCandidatos] = useState("");
+  const [partidos, setPartidos] = useState([]);
 
-  const tiposEleccion = [
-    { label: "Nacional", value: 1 },
-    { label: "Departamental", value: 2 },
-    { label: "Municipal", value: 3 },
-    { label: "Plebiscito", value: 4 },
-    { label: "Ballotage", value: 5 },
-    { label: "Referendum", value: 6 },
-  ];
+  // Obtener partidos desde la API
+  useEffect(() => {
+    fetch("http://localhost:8000/api/partidos")
+      .then((res) => res.json())
+      .then((data) => setPartidos(data))
+      .catch((err) => console.error("Error al cargar partidos", err));
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:8000/listas", {
+      const response = await fetch("http://localhost:8000/api/listas", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           numero,
-          partido,
-          candidatos,
+          id_partido: partidoSeleccionado,
           id_eleccion: idEleccion,
-          id_tipo_eleccion: tipo,
+          candidatos,
         }),
       });
 
@@ -41,12 +39,10 @@ const ListaForm = () => {
       }
 
       alert("Lista cargada exitosamente");
-
       setNumero("");
-      setPartido("");
-      setCandidatos("");
+      setPartidoSeleccionado("");
       setIdEleccion("");
-      setTipo("");
+      setCandidatos("");
     } catch (err) {
       alert("Error: " + err.message);
     }
@@ -57,50 +53,49 @@ const ListaForm = () => {
       <Typography variant="h5" gutterBottom align="center">
         CARGAR LISTA
       </Typography>
+
       <Box
         component="form"
         onSubmit={handleSubmit}
         sx={{ display: "flex", flexDirection: "column", gap: 2 }}
       >
         <TextField
-          label="Número"
+          label="Número de lista"
           value={numero}
           onChange={(e) => setNumero(e.target.value)}
           fullWidth
         />
+
         <TextField
+          select
           label="Partido"
-          value={partido}
-          onChange={(e) => setPartido(e.target.value)}
+          value={partidoSeleccionado}
+          onChange={(e) => setPartidoSeleccionado(e.target.value)}
           fullWidth
-        />
+        >
+          {partidos.map((p) => (
+            <MenuItem key={p.id} value={p.id}>
+              {p.nombre}
+            </MenuItem>
+          ))}
+        </TextField>
+
         <TextField
-          label="Candidatos"
-          value={candidatos}
-          onChange={(e) => setCandidatos(e.target.value)}
-          fullWidth
-        />
-        <TextField
-          label="Número de elección"
+          label="ID Elección"
           value={idEleccion}
           onChange={(e) => setIdEleccion(e.target.value)}
           fullWidth
         />
+
         <TextField
-          select
-          label="Tipo de elección"
-          value={tipo}
-          onChange={(e) => setTipo(e.target.value)}
+          label="Candidatos (separados por coma)"
+          value={candidatos}
+          onChange={(e) => setCandidatos(e.target.value)}
           fullWidth
-        >
-          {tiposEleccion.map((option) => (
-            <MenuItem key={option.value} value={option.value}>
-              {option.label}
-            </MenuItem>
-          ))}
-        </TextField>
+        />
+
         <Box sx={{ display: "flex", justifyContent: "space-around", mt: 2 }}>
-          <Button type="submit" variant="contained" color="success">
+          <Button variant="contained" color="success" type="submit">
             Aceptar
           </Button>
           <Button
@@ -108,10 +103,9 @@ const ListaForm = () => {
             color="error"
             onClick={() => {
               setNumero("");
-              setPartido("");
-              setCandidatos("");
+              setPartidoSeleccionado("");
               setIdEleccion("");
-              setTipo("");
+              setCandidatos("");
             }}
           >
             Cancelar

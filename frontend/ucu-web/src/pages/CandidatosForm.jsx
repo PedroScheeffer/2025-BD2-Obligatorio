@@ -19,7 +19,7 @@ const CandidatosForm = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:8000/candidatos", {
+      const response = await fetch("http://localhost:8000/api/candidatos", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

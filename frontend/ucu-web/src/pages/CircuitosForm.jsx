@@ -12,7 +12,7 @@ const CircuitosForm = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:8000/circuitos", {
+      const response = await fetch("http://localhost:8000/api/circuitos", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -6,13 +6,20 @@ const EleccionesForm = () => {
   const [tipo, setTipo] = useState("");
   const [fecha, setFecha] = useState("");
 
-  const tiposEleccion = ["Nacional", "Departamental", "Municipal", "Plebiscito", "Ballotage", "Referendum"];
+  // Lista con valores correctos para la base de datos y etiquetas amigables
+  const tiposEleccion = [
+    { label: "Presidencial", value: "presidencial" },
+    { label: "Ballotage", value: "ballotage" },
+    { label: "Municipales", value: "municipales" },
+    { label: "Plebiscito", value: "plebiscito" },
+    { label: "Referéndum", value: "referéndum" }
+  ];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:8000/elecciones", {
+      const response = await fetch("http://localhost:8000/api/elecciones", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -53,8 +60,8 @@ const EleccionesForm = () => {
           fullWidth
         >
           {tiposEleccion.map((option) => (
-            <MenuItem key={option} value={option}>
-              {option}
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
             </MenuItem>
           ))}
         </TextField>
@@ -69,7 +76,7 @@ const EleccionesForm = () => {
         />
 
         <Box sx={{ display: "flex", justifyContent: "space-around", mt: 2 }}>
-          <Button variant="contained" color="success" onClick={handleSubmit}>
+          <Button variant="contained" color="success" type="submit">
             Aceptar
           </Button>
           <Button

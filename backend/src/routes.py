@@ -15,6 +15,7 @@ from services.CircuitoService import CircuitoService
 from services.ListaService import ListaService
 from services.EleccionesService import EleccionesService
 from services.CandidatoService import CandidatoService
+from config.db import get_connection
 
 # Crea un router para organizar las rutas
 router = APIRouter()
@@ -84,8 +85,8 @@ async def delete_persona(cc: str, headers: dict = Depends(get_auth_headers)):
         logging.error(f"Error deleting persona with CC {cc}: {e}")
         raise HTTPException(status_code=400, detail=str(e))
 
-from services.CircuitoService import CircuitoService  #
- Asegurate de importar correctamente
+from services.CircuitoService import CircuitoService  
+
 @router.post("/circuitos")
 async def registrar_circuito(circuito_data: dict):
     try:
@@ -128,6 +129,7 @@ async def registrar_candidato(candidato_data: dict):
             raise HTTPException(status_code=500, detail="No se pudo registrar el candidato")
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+        
 @router.post("/login")
 async def login(request: Request):
     data = await request.json()
@@ -168,3 +170,18 @@ def get_resultados(categoria: str):
     except Exception as e:
         print("Error en get_resultados:", str(e))
         raise HTTPException(status_code=500, detail="Error al obtener resultados")
+
+
+@router.get("/partidos")
+def obtener_partidos():
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("SELECT id, nombre FROM PARTIDO")
+    partidos = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return partidos
+

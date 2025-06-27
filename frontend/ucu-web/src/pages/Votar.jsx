@@ -62,7 +62,6 @@ const Votar = () => {
     <FormContainer>
       <Typography variant="h5" gutterBottom align="center">VOTAR</Typography>
       <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-<<<<<<< HEAD
         <FormGroup>
           {opciones.map((op) => (
             <FormControlLabel
@@ -80,25 +79,6 @@ const Votar = () => {
             />
           ))}
         </FormGroup>
-=======
-      <FormGroup>
-        {Array.isArray(opciones) && opciones.map((op) => (
-          <FormControlLabel
-            key={op.label}
-            control={
-              <Checkbox
-                checked={seleccionado?.label === op.label}
-                onChange={() => handleChange(op)}
-                sx={{
-                    "&.Mui-checked": { color: "success.main" },
-                  }}
-              />
-            }
-            label={op.label}
-          />
-        ))}
-      </FormGroup>
->>>>>>> 361c5296bd1db0062737fe44a32b524a5e989dc7
       </Box>
       <Box sx={{ mt: 3, display: "flex", justifyContent: "space-around" }}>
         <Button variant="contained" color="success" onClick={handleVotar}>Votar</Button>        
