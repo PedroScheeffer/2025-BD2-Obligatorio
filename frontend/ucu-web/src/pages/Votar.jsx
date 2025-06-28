@@ -65,7 +65,7 @@ const Votar = () => {
         <FormGroup>
           {opciones.map((op) => (
             <FormControlLabel
-              key={op}
+              key={op.valor_lista}
               control={
                 <Checkbox
                   checked={seleccionado === op}
@@ -75,7 +75,7 @@ const Votar = () => {
                   }}
                 />
               }
-              label={op}
+              label={op.label || op.valor_lista || "Opción"}
             />
           ))}
         </FormGroup>

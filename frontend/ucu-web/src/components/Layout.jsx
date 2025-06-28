@@ -6,7 +6,6 @@ import ListaForm from "../pages/ListaForm";
 import CandidatosForm from "../pages/CandidatosForm";
 import CircuitosForm from "../pages/CircuitosForm";
 import VerResultados from "../pages/VerResultados";
-import Votar from "../pages/Votar";
 
 const Layout = ({ currentPage, setCurrentPage }) => {
   const renderContent = () => {
@@ -19,8 +18,6 @@ const Layout = ({ currentPage, setCurrentPage }) => {
         return <CandidatosForm />;
       case "circuitos":
         return <CircuitosForm />;
-      case "votar":
-        return <Votar />;
       case "ver-resultados":
         return <VerResultados tipo={currentPage} />;
       default:

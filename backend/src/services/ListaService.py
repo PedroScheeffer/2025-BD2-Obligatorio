@@ -29,8 +29,7 @@ class ListaService:
             valores_lista = (
                 data["numero"],
                 data["id_partido"],
-                data["id_eleccion"],
-                id_tipo_eleccion
+                data["id_eleccion"]
             )
 
             cursor.execute(insert_lista, valores_lista)
@@ -44,15 +43,14 @@ class ListaService:
                         valor_lista,
                         id_partido,
                         id_eleccion
-                    ) VALUES (%s, %s, %s, %s, %s)
+                    ) VALUES (%s, %s, %s, %s)
                 """
 
                 valores_candidato = (
                     cc.strip(),                     # cc_persona
                     data["numero"],                # valor_lista
                     data["id_partido"],
-                    data["id_eleccion"],
-                    id_tipo_eleccion
+                    data["id_eleccion"]
                 )
 
                 cursor.execute(insert_candidato_lista, valores_candidato)

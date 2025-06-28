@@ -36,13 +36,13 @@ const VerResultados = ({ tipo }) => {
         {tipo === "ver-resultados" ? "RESULTADOS" : "CIRCUITOS"}
       </Typography>
 
-      <Box sx={{ mt: 4, width: "100%" }}>
+      <Box sx={{ mt: 4, width: "100%"}}>
         <FormControl fullWidth>
           <InputLabel id="categoria-label">Seleccione una opción</InputLabel>
           <Select
             labelId="categoria-label"
             value={categoria}
-            label="Seleccione una opción"
+            label="Seleccioná una opción"
             onChange={handleChange}
           >
             {opciones.map(({ value, label }) => (
@@ -56,7 +56,30 @@ const VerResultados = ({ tipo }) => {
 
       {categoria && resultados.length > 0 && (
         <Box sx={{ mt: 4 }}>
-          {/* contenido según categoría seleccionada */}
+          <Paper>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>{categoria.toUpperCase()}</TableCell>
+                  <TableCell>Votos válidos</TableCell>
+                  <TableCell>Votos anulados</TableCell>
+                  <TableCell>Votos en blanco</TableCell>
+                  <TableCell>Votos observados</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {resultados.map((item, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{item.nombre}</TableCell>
+                    <TableCell>{item.votos_validos}</TableCell>
+                    <TableCell>{item.votos_anulados}</TableCell>
+                    <TableCell>{item.votos_blanco}</TableCell>
+                    <TableCell>{item.votos_observados}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Paper>
         </Box>
       )}
     </FormContainer>

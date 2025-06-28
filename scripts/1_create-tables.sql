@@ -58,8 +58,8 @@ CREATE TABLE PERSONA(
 
     ci VARCHAR(8) NOT NULL UNIQUE CHECK (ci REGEXP '^[0-9]+$'),
     nombre VARCHAR(255),
-    fecha_nacimiento DATE NOT NULL
-    contrasena TEXT NOT NULL, -- Por defecto 1234
+    fecha_nacimiento DATE NOT NULL,
+    contrasena TEXT NOT NULL 
 );
 
 CREATE TABLE VOTANTE(

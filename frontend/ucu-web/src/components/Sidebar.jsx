@@ -11,9 +11,6 @@ const Sidebar = ({ setCurrentPage }) => {
       <Button onClick={() => setCurrentPage("circuitos")}>Cargar circuitos</Button>
 
       {/* Funciones de votación */}
-      <Button onClick={() => setCurrentPage("ver-circuito")}>Ver circuito</Button>
-      <Button onClick={() => setCurrentPage("votar")}>Votar</Button>
-      
       <Button onClick={() => setCurrentPage("ver-resultados")}>Ver resultados</Button>
     </div>
   );

@@ -126,7 +126,7 @@ class PersonaService:
         if not persona:
             raise Exception("Credencial no registrada")
 
-        if contrasena != cc:
+        if contrasena != persona["contrasena"]:
             raise Exception("Contraseña inválida")
 
         if rol == "votante":
