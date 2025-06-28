@@ -36,13 +36,13 @@ const VerResultados = ({ tipo }) => {
         {tipo === "ver-resultados" ? "RESULTADOS" : "CIRCUITOS"}
       </Typography>
 
-      <Box sx={{ mt: 4, width: "100%"}}>
+      <Box sx={{ mt: 4, width: "100%" }}>
         <FormControl fullWidth>
           <InputLabel id="categoria-label">Seleccione una opción</InputLabel>
           <Select
             labelId="categoria-label"
             value={categoria}
-            label="Seleccioná una opción"
+            label="Seleccione una opción"
             onChange={handleChange}
           >
             {opciones.map(({ value, label }) => (
@@ -56,24 +56,7 @@ const VerResultados = ({ tipo }) => {
 
       {categoria && resultados.length > 0 && (
         <Box sx={{ mt: 4 }}>
-          <Paper>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>{categoria.toUpperCase()}</TableCell>
-                  <TableCell>Votos</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {resultados.map((item, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{Object.values(item)[0]}</TableCell>
-                    <TableCell>{Object.values(item)[1]}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </Paper>
+          {/* contenido según categoría seleccionada */}
         </Box>
       )}
     </FormContainer>
