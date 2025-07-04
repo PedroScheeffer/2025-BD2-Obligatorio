@@ -1,8 +1,10 @@
 import os
 import mysql.connector
 from mysql.connector import Error
+from mysql.connector.abstracts import MySQLConnectionAbstract
+from mysql.connector.pooling import PooledMySQLConnection
 
-def get_connection():
+def get_connection() -> PooledMySQLConnection | MySQLConnectionAbstract:
     try:
         conn = mysql.connector.connect(
             host=os.getenv("DB_HOST", "localhost"),
@@ -14,4 +16,4 @@ def get_connection():
         return conn
     except Error as e:
         print(f"Error al conectar a la base de datos: {e}")
-        return None
+        raise e

@@ -1,6 +1,6 @@
 import os
 import mysql.connector
-import logging
+from config.logger import logger
 
 
 class MySQLScriptRunner:
@@ -27,7 +27,7 @@ class MySQLScriptRunner:
     __CONNECTION = None
 
     # Logger instance
-    __logger = logging.getLogger(__name__)
+    __logger = logger
 
     # ->>> MÉTODOS DE CLASE.
     # cls se refiere a la clase, no a una instancia; permite obtener los atributos y llamar a los métodos de clase.
@@ -183,7 +183,7 @@ class MySQLScriptRunner:
         return result
 
     @classmethod
-    def run_insert_script_and_get_id(cls, script: str, params: tuple = None) -> int:
+    def run_insert_script_and_get_id(cls, script: str, params: tuple = None) -> int | str | None:
         """
             Ejecuta un script de INSERT en MySQL y retorna el ID del registro insertado.
 
@@ -201,6 +201,10 @@ class MySQLScriptRunner:
             # Establece la conexión con la base de datos.
             cls.__start_database_connection()
 
+            if not cls.__CONNECTION:
+                cls.__logger.error("No database connection available.")
+                return None
+
             # Crea el cursor para ejecutar el comando SQL.
             cursor = cls.__CONNECTION.cursor()
 
@@ -213,6 +217,9 @@ class MySQLScriptRunner:
             # Obtiene el ID del último registro insertado
             last_id = cursor.lastrowid
 
+            if last_id == 0 and params:
+                last_id = params[0]
+
             # Confirma (commit) los cambios en la base de datos.
             cls.__CONNECTION.commit()
 
@@ -222,7 +229,7 @@ class MySQLScriptRunner:
         except mysql.connector.Error as error:
             cls.__logger.error(
                 f"Error al ejecutar el script de inserción: {error}")
-
+            cls.__logger.debug(script)
             # Realiza un rollback para revertir los cambios en caso de error.
             if cls.__CONNECTION:
                 cls.__CONNECTION.rollback()

@@ -1,17 +1,21 @@
-from typing import Optional, List, Dict, Any, Type
+from typing import Optional, List, Any, Type, TypeVar, Generic, TYPE_CHECKING
 
-from annotated_types import T
 from services.orm_casero.MySQLScriptRunner import MySQLScriptRunner
 from services.orm_casero.MySQLScriptGenerator import MySQLScriptGenerator as Querier
 from config.logger import logger
 
+if TYPE_CHECKING:
+    from model.BaseEntity import BaseEntity
 
-class CRUDBase:
+T = TypeVar('T', bound='BaseEntity')
+
+
+class CRUDBase(Generic[T]):
     """
     Generico clase con op CRUD para manejar entidades en una base de datos MySQL.
     """
 
-    def __init__(self, model_class: T, table_name: str, primary_key: str = "id"):
+    def __init__(self, model_class: Type[T], table_name: str, primary_key: str = "id"):
         self.model_class = model_class
         self.table_name = table_name
         self.primary_key = primary_key
@@ -27,9 +31,9 @@ class CRUDBase:
                 script=script, params=params
             )
             if inserted_id is not None:
-                # Update the entity's ID with the database-generated ID
-                if hasattr(entity, 'id'):
-                    entity.id = inserted_id
+                # Update the entity's primary key attribute with the database-generated ID
+                if hasattr(entity, self.primary_key):
+                    setattr(entity, self.primary_key, inserted_id)
                 logger.info(
                     f"Successfully inserted entity into {self.table_name} with ID {inserted_id}")
                 return entity
@@ -50,12 +54,12 @@ class CRUDBase:
             )
             result = MySQLScriptRunner.run_script_to_modify_database(
                 script=script, params=params
-            )  
+            )
             if result:
                 logger.info(
                     f"Successfully updated entity in {self.table_name} with {self.primary_key}={filter_value}")
-                result = entity.crud().get_by_id(entity.filter_value)
-            return result
+                return entity
+            return None
         except Exception as e:
             logger.error(f"Error updating {self.table_name}: {e}")
             return None
@@ -95,7 +99,8 @@ class CRUDBase:
             if result:
                 logger.debug(
                     f"Found entity in {self.table_name} with {self.primary_key}={id_value}")
-                entity = self.model_class(**result)
+                # result is a list, we expect only one
+                entity = self.model_class(**result[0])
                 return entity
             logger.debug(
                 f"No entity found in {self.table_name} with {self.primary_key}={id_value}")
@@ -119,7 +124,7 @@ class CRUDBase:
             if result:
                 logger.debug(
                     f"Found entity in {self.table_name} with {field_name}={field_value}")
-                return self.model_class(**result)
+                return self.model_class(**result[0])
             logger.debug(
                 f"No entity found in {self.table_name} with {field_name}={field_value}")
             return None

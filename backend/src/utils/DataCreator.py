@@ -5,14 +5,14 @@ from model.relacion.CandidatoLista import CandidatoLista
 from faker import Faker
 from random import choice, randint
 from datetime import date, timedelta
-from model.personas.Persona import Persona
-from model.personas.Policia import Policia
+from model.personas.Persona import Persona, PersonaSchema
+from model.personas.Policia import Policia, PoliciaSchema
 from model.personas.Votante import Votante
-from model.personas.Funcionario import Funcionario
-from model.personas.Presidente import Presidente
-from model.personas.Secretario import Secretario
+from model.personas.Funcionario import Funcionario, FuncionarioSchema
+from model.personas.Presidente import Presidente, PresidenteSchema
+from model.personas.Secretario import Secretario, SecretarioSchema
 from model.personas.Vocal import Vocal
-from model.personas.Candidato import Candidato
+from model.personas.Candidato import Candidato, CandidatoSchema
 from model.Partido import Partido
 from model.Lista import Lista
 from model.Eleccion import Eleccion
@@ -105,7 +105,7 @@ def create_and_insert_personas(n: int = 20) -> List[str]:
     ccs = []
     for _ in range(n):
         persona = create_random_persona()
-        persona.crud().insert(persona)
+        persona.insert()
         personas.append(persona)
         ccs.append(persona.cc)
     return ccs
@@ -160,25 +160,23 @@ def create_and_insert_elecciones(n: int = 5) -> List[int]:
 # --- CIRCUITO ---
 
 
-def create_random_circuito(est_id: int, eleccion_id: int, tipo_eleccion_id: int) -> Circuito:
+def create_random_circuito(est_id: int, eleccion_id: int) -> Circuito:
     return Circuito(
         id=None,
         accesibilidad=fake.boolean(),
         id_establecimiento=est_id,
-        id_eleccion=eleccion_id,
-        id_tipo_eleccion=tipo_eleccion_id
+        id_eleccion=eleccion_id
     )
 
 
-def create_and_insert_circuitos(est_ids: List[int], eleccion_ids: List[int], tipo_eleccion_ids: List[int], n: int = 10) -> List[int]:
+def create_and_insert_circuitos(est_ids: List[int], eleccion_ids: List[int], n: int = 10) -> List[int]:
     ids = []
     for _ in range(n):
         circuito = create_random_circuito(
             choice(est_ids),
-            choice(eleccion_ids),
-            choice(tipo_eleccion_ids)
+            choice(eleccion_ids)
         )
-        circuito.crud().insert(circuito)
+        circuito.insert()
         ids.append(circuito.id)
     return ids
 
@@ -213,135 +211,206 @@ def create_and_insert_mesas(circuito_ids: List[int], vocal_ccs: List[str], secre
 # --- VOTANTE ---
 
 
-def create_random_votante(cc_persona: str, circuito_id: int) -> Votante:
+def create_random_votante(cc: str, circuito_id: int) -> Votante:
+    persona = Persona.get_by_id(cc)  # Ensure the persona exists
+    if not persona:
+        raise ValueError(f"Persona with cc {cc} does not exist.")
+    persona_dict = persona.__dict__
+
     return Votante(
-        cc_persona=cc_persona,
         voto=fake.boolean(),
-        id_circuito=circuito_id
+        id_circuito=circuito_id,
+        **persona_dict
     )
 
 
 def create_and_insert_votantes(persona_ccs: List[str], circuito_ids: List[int], n: int = 10) -> List[str]:
     votantes = []
     ccs = []
+    # Ensure there are circuits to assign votantes to
+    if not circuito_ids:
+        print("Warning: No circuit IDs provided to create_and_insert_votantes. Skipping.")
+        return ccs
+    if not persona_ccs:
+        print("Warning: No persona_ccs provided to create_and_insert_votantes. Skipping.")
+        return ccs
+
     for _ in range(n):
         votante = create_random_votante(
             choice(persona_ccs),
             choice(circuito_ids)
         )
-        votante.crud().insert(votante)
+        votante.insert()
         votantes.append(votante)
-        ccs.append(votante.cc_persona)
+        ccs.append(votante.cc)
     return ccs
 
 # --- POLICIA ---
 
 
-def create_random_policia(cc_persona: str, est_id: int) -> Policia:
+def create_random_policia(cc: str, est_id: int) -> Policia:
+    persona = Persona.get_by_id(cc)  # Ensure the persona exists
+    if not persona:
+        raise ValueError(f"Persona with cc {cc} does not exist.")
+    persona_dict = persona.__dict__
+    persona_validated = PersonaSchema.model_validate(persona_dict).model_dump()
+
     return Policia(
-        cc_persona=cc_persona,
         comisaria=fake.word(),
-        fk_id_establecimiento=est_id
+        fk_id_establecimiento=est_id,
+        **persona_validated
     )
 
 
 def create_and_insert_policias(persona_ccs: List[str], est_ids: List[int], n: int = 5) -> List[str]:
     policias = []
     ccs = []
+    if not persona_ccs:
+        print("Warning: No persona_ccs provided to create_and_insert_policias. Skipping.")
+        return ccs
+    if not est_ids:
+        print("Warning: No est_ids provided to create_and_insert_policias. Skipping.")
+        return ccs
     for _ in range(n):
         policia = create_random_policia(
             choice(persona_ccs),
-            choice(est_ids)
+            choice(est_ids),
         )
         policia.crud().insert(policia)
         policias.append(policia)
-        ccs.append(policia.cc_persona)
+        ccs.append(policia.cc)
     return ccs
 
 # --- FUNCIONARIO ---
 
 
-def create_random_funcionario(cc_persona: str) -> Funcionario:
-    return Funcionario(cc_persona=cc_persona)
+def create_random_funcionario(cc: str) -> Funcionario:
+    persona = Persona.get_by_id(cc)  # Ensure the persona exists
+    if not persona:
+        raise ValueError(f"Persona with cc {cc} does not exist.")
+    persona_dict = persona.__dict__
+    persona_validated = PersonaSchema.model_validate(persona_dict).model_dump()
+
+    return Funcionario(**persona_validated)
 
 
 def create_and_insert_funcionarios(persona_ccs: List[str], n: int = 5) -> List[str]:
     funcionarios = []
     ccs = []
+    if not persona_ccs:
+        print(
+            "Warning: No persona_ccs provided to create_and_insert_funcionarios. Skipping.")
+        return ccs
     for _ in range(n):
         funcionario = create_random_funcionario(choice(persona_ccs))
-        funcionario.crud().insert(funcionario)
+        funcionario.insert()
         funcionarios.append(funcionario)
-        ccs.append(funcionario.cc_persona)
+        ccs.append(funcionario.cc)
     return ccs
 
 # --- PRESIDENTE ---
 
 
-def create_random_presidente(cc_persona: str) -> Presidente:
-    return Presidente(cc_persona=cc_persona)
+def create_random_presidente(cc: str) -> Presidente:
+    persona = Persona.get_by_id(cc)  # Ensure the persona exists
+    if not persona:
+        raise ValueError(f"Persona with cc {cc} does not exist.")
+    persona_dict = persona.__dict__
+    persona_validated = PersonaSchema.model_validate(persona_dict).model_dump()
+
+    return Presidente(**persona_validated)
 
 
 def create_and_insert_presidentes(funcionario_ccs: List[str], n: int = 2) -> List[str]:
     presidentes = []
     ccs = []
+    if not funcionario_ccs:
+        print("Warning: No funcionario_ccs provided to create_and_insert_presidentes. Skipping.")
+        return ccs
     for _ in range(n):
         presidente = create_random_presidente(choice(funcionario_ccs))
         presidente.crud().insert(presidente)
         presidentes.append(presidente)
-        ccs.append(presidente.cc_persona)
+        ccs.append(presidente.cc)
     return ccs
 
 # --- SECRETARIO ---
 
 
-def create_random_secretario(cc_persona: str) -> Secretario:
-    return Secretario(cc_persona=cc_persona)
+def create_random_secretario(cc: str) -> Secretario:
+    persona = Persona.get_by_id(cc)  # Ensure the persona exists
+    if not persona:
+        raise ValueError(f"Persona with cc {cc} does not exist.")
+    persona_dict = persona.__dict__
+    persona_validated = PersonaSchema.model_validate(persona_dict).model_dump()
+
+    return Secretario(**persona_validated)
 
 
 def create_and_insert_secretarios(funcionario_ccs: List[str], n: int = 2) -> List[str]:
     secretarios = []
     ccs = []
+    if not funcionario_ccs:
+        print("Warning: No funcionario_ccs provided to create_and_insert_secretarios. Skipping.")
+        return ccs
     for _ in range(n):
         secretario = create_random_secretario(choice(funcionario_ccs))
         secretario.crud().insert(secretario)
         secretarios.append(secretario)
-        ccs.append(secretario.cc_persona)
+        ccs.append(secretario.cc)
     return ccs
 
 # --- VOCAL ---
 
 
-def create_random_vocal(cc_persona: str) -> Vocal:
-    return Vocal(cc_persona=cc_persona)
+def create_random_vocal(cc: str) -> Vocal:
+    persona = Persona.get_by_id(cc)  # Ensure the persona exists
+    if not persona:
+        raise ValueError(f"Persona with cc {cc} does not exist.")
+    persona_dict = persona.__dict__
+    return Vocal(**persona_dict)
 
 
 def create_and_insert_vocales(funcionario_ccs: List[str], n: int = 2) -> List[str]:
     vocales = []
     ccs = []
+    if not funcionario_ccs:
+        print(
+            "Warning: No funcionario_ccs provided to create_and_insert_vocales. Skipping.")
+        return ccs
     for _ in range(n):
         vocal = create_random_vocal(choice(funcionario_ccs))
         vocal.crud().insert(vocal)
         vocales.append(vocal)
-        ccs.append(vocal.cc_persona)
+        ccs.append(vocal.cc)
     return ccs
 
 # --- CANDIDATO ---
 
 
-def create_random_candidato(cc_persona: str) -> Candidato:
+def create_random_candidato(cc: str) -> Candidato:
     tipo = randint(1, 4)  # Assuming 4 types in master data
-    return Candidato(cc_persona=cc_persona, id_tipo=tipo)
+    persona = Persona.get_by_id(cc)  # Ensure the persona exists
+    if not persona:
+        raise ValueError(f"Persona with cc {cc} does not exist.")
+    persona_dict = persona.__dict__
+    persona_validated = CandidatoSchema.model_validate(
+        persona_dict).model_dump()
+
+    return Candidato(**persona_validated, id_tipo=tipo)
 
 
 def create_and_insert_candidatos(persona_ccs: List[str], n: int = 5) -> List[str]:
     candidatos = []
     ccs = []
+    if not persona_ccs:
+        print("Warning: No persona_ccs provided to create_and_insert_candidatos. Skipping.")
+        return ccs
     for _ in range(n):
         candidato = create_random_candidato(choice(persona_ccs))
         candidato.crud().insert(candidato)
         candidatos.append(candidato)
-        ccs.append(candidato.cc_persona)
+        ccs.append(candidato.cc)
     return ccs
 
 # --- LISTA ---
@@ -399,9 +468,9 @@ def create_and_insert_votos(listas: List[tuple], circuito_ids: List[int], n: int
 # --- CANDIDATO_LISTA ---
 
 
-def create_random_candidato_lista(cc_persona: str, lista: Lista) -> CandidatoLista:
+def create_random_candidato_lista(cc: str, lista: Lista) -> CandidatoLista:
     return CandidatoLista(
-        cc_persona=cc_persona,
+        cc=cc,
         valor_lista=lista.valor,
         id_partido=lista.id_partido,
         id_eleccion=lista.id_eleccion
@@ -417,5 +486,5 @@ def create_and_insert_candidato_listas(persona_ccs: List[str], listas: List[tupl
         candidato_lista = create_random_candidato_lista(
             choice(persona_ccs), lista_obj)
         candidato_lista.crud().insert(candidato_lista)
-        ccs.append(candidato_lista.cc_persona)
+        ccs.append(candidato_lista.cc)
     return ccs

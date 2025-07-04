@@ -13,7 +13,9 @@ from services.orm_casero.MySQLScriptGenerator import MySQLScriptGenerator
 from typing import Optional
 
 
-class MockEntity:
+from model.BaseEntity import BaseEntity
+
+class MockEntity(BaseEntity):
     """Mock entity class for testing"""
     def __init__(self, id: Optional[int] = None, name: str = "", email: str = ""):
         self.id = id
