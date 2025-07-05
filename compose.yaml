@@ -21,49 +21,49 @@ services:
     container_name: app
     ports:
       - "8000:8000"
-    environment:
-      - DB_HOST=db
-      - DB_PORT=3306
-      - DB_USER=presi
-      - DB_PASSWORD=votosecreto
-      - DB_NAME=IC_Grupo3
+    # environment:
+    #   - DB_HOST=db
+    #   - DB_PORT=3306
+    #   - DB_USER=presi
+    #   - DB_PASSWORD=votosecreto
+    #   - DB_NAME=IC_Grupo3
+    # depends_on:
+    #   db:
+    #     condition: service_healthy
     volumes:
       - ./backend/src:/src
 
-    depends_on:
-      db:
-        condition: service_healthy
-    # env_file:
-    #   - ./.env
+    env_file:
+      - ./.env
     networks:
       - ucu_network
 
-  db:
-    image: mysql:8.0
-    container_name: db
-    environment:
-      MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_DATABASE: IC_Grupo3
-      MYSQL_USER: presi
-      MYSQL_PASSWORD: votosecreto
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "presi", "--password=votosecreto"]
-      interval: 15s
-      timeout: 10s
-      retries: 10
-    ports:
-      - "3306:3306"
+  # db:
+  #   image: mysql:8.0
+  #   container_name: db
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: root_password
+  #     MYSQL_DATABASE: IC_Grupo3
+  #     MYSQL_USER: presi
+  #     MYSQL_PASSWORD: votosecreto
+  #   healthcheck:
+  #     test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "presi", "--password=votosecreto"]
+  #     interval: 15s
+  #     timeout: 10s
+  #     retries: 10
+  #   ports:
+  #     - "3306:3306"
 
-    volumes:
-      - db_data:/var/lib/mysql
-      - ./scripts:/docker-entrypoint-initdb.d
+  #   volumes:
+  #     - db_data:/var/lib/mysql
+  #     - ./scripts:/docker-entrypoint-initdb.d
       
-    networks:
-      - ucu_network
+  #   networks:
+  #     - ucu_network
 
 volumes:
   node_modules_volume:
-  db_data:
+  # db_data:
 
 networks:
   ucu_network:
