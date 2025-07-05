@@ -1,5 +1,6 @@
 from config.db import get_connection
 
+
 class ListaService:
     @staticmethod
     def registrar_lista(data):
@@ -39,7 +40,7 @@ class ListaService:
             for cc in candidatos:
                 insert_candidato_lista = """
                     INSERT INTO CANDIDATO_LISTA (
-                        cc_persona,
+                        cc,
                         valor_lista,
                         id_partido,
                         id_eleccion
@@ -47,7 +48,7 @@ class ListaService:
                 """
 
                 valores_candidato = (
-                    cc.strip(),                     # cc_persona
+                    cc.strip(),                     # cc
                     data["numero"],                # valor_lista
                     data["id_partido"],
                     data["id_eleccion"]

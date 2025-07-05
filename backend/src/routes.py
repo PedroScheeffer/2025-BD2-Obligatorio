@@ -62,9 +62,9 @@ async def get_all_personas(headers: dict = Depends(get_auth_headers)):
         raise HTTPException(status_code=500, detail=str(e))
     
 @router.post("/personas")
-async def create_persona(persona_data: PersonaSchema, headers: dict = Depends(get_auth_headers)):
+async def create_persona(persona_data: PersonaSchema):
     try:
-        return PersonaService.create_persona(persona_data, headers)
+        return PersonaService.create_persona(persona_data)
     except Exception as e:
         logging.error(f"Error creating persona: {e}")
         raise HTTPException(status_code=400, detail=str(e))

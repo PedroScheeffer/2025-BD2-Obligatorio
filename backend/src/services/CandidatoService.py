@@ -1,5 +1,6 @@
 from config.db import get_connection
 
+
 class CandidatoService:
     @staticmethod
     def registrar_candidato(data):
@@ -7,7 +8,8 @@ class CandidatoService:
         cursor = conn.cursor(dictionary=True)
 
         try:
-            cursor.execute("SELECT * FROM PERSONA WHERE cc = %s", (data["cc_persona"],))
+            cursor.execute(
+                "SELECT * FROM PERSONA WHERE cc = %s", (data["cc"],))
             persona = cursor.fetchone()
 
             if not persona:
@@ -16,17 +18,17 @@ class CandidatoService:
                     VALUES (%s, %s, %s)
                 """
                 cursor.execute(insert_persona, (
-                    data["cc_persona"],
+                    data["cc"],
                     data["nombre"],
                     data["fecha_nacimiento"]
                 ))
 
             insert_candidato = """
-                INSERT INTO CANDIDATO (cc_persona, id_tipo)
+                INSERT INTO CANDIDATO (cc, id_tipo)
                 VALUES (%s, %s)
             """
             cursor.execute(insert_candidato, (
-                data["cc_persona"],
+                data["cc"],
                 data["id_tipo"]
             ))
 

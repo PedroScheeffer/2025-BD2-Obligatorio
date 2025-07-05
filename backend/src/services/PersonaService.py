@@ -13,6 +13,8 @@ from enum import Enum
 from config.db import get_connection
 
 # Esta clase se encarga de persona y sus genericaciones
+
+
 class PersonaRol(str, Enum):
     CANDIDATO = "Candidato"
     FUNCIONARIO = "Funcionario"
@@ -25,43 +27,40 @@ class PersonaRol(str, Enum):
 
 class PersonaService:
     @staticmethod
-    def create_persona(persona_data: PersonaSchema, rol, headers: dict) -> dict:
+    def create_persona(persona_data: PersonaSchema) -> Persona | None:
         """Create a new persona with validation"""
-        if not Validator.is_admin(headers=headers):
-            raise Exception("User is not authorized to create personas")
 
         existing_persona = Persona.crud().get_by_id(persona_data.cc)
         if existing_persona:
             raise Exception(
                 f"Persona with CC {persona_data.cc} already exists")
 
-
         persona = Persona(**persona_data.model_dump())
-        success = persona.crud().insert()
+        success = persona.insert()
 
         if not success:
             raise Exception("Failed to create persona in database")
-        return persona
+        return success
 
     @staticmethod
-    def get_persona_by_cc(cc: str, headers: dict) -> dict:
+    def get_persona_by_cc(cc: str, headers: dict) -> Persona | None:
         """Get persona by cc"""
         if not Validator.is_admin(headers=headers):
             raise Exception("User is not authorized to view personas")
 
-        persona_data = Persona.get_persona(cc)
+        persona_data = Persona.get_by_id(cc)
         if not persona_data:
             raise Exception(f"Persona with CC {cc} not found")
 
         return persona_data
 
     @staticmethod
-    def get_all_personas(headers: dict) -> List[dict]:
+    def get_all_personas(headers: dict) -> List[Persona]:
         """Get all personas"""
         if not Validator.is_admin(headers=headers):
             raise Exception("User is not authorized to view personas")
 
-        return Persona.get_all_personas()
+        return Persona.get_all()
 
     @staticmethod
     def update_persona(cc: str, persona_data: PersonaSchema, headers: dict) -> dict:
@@ -111,7 +110,7 @@ class PersonaService:
             raise Exception("Failed to delete persona from database")
 
         return {"message": "Persona deleted successfully"}
-    
+
     @staticmethod
     def login(cc: str, contrasena: str, rol: str):
         conn = get_connection()
@@ -130,7 +129,7 @@ class PersonaService:
             raise Exception("Contraseña inválida")
 
         if rol == "votante":
-            cursor.execute("SELECT * FROM VOTANTE WHERE cc_persona = %s", (cc,))
+            cursor.execute("SELECT * FROM VOTANTE WHERE cc = %s", (cc,))
             votante = cursor.fetchone()
             if votante:
                 return {"rol": rol, "persona": persona, "id_circuito": votante["id_circuito"]}
@@ -138,7 +137,7 @@ class PersonaService:
                 raise Exception("La persona no es votante")
 
         elif rol == "funcionario":
-            cursor.execute("SELECT 1 FROM FUNCIONARIO WHERE cc_persona = %s", (cc,))
+            cursor.execute("SELECT 1 FROM FUNCIONARIO WHERE cc = %s", (cc,))
             if cursor.fetchone():
                 return {"rol": rol, "persona": persona}
             else:
@@ -146,5 +145,3 @@ class PersonaService:
 
         else:
             raise Exception("Rol inválido")
-
-        

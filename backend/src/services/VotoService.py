@@ -2,6 +2,7 @@ import mysql.connector
 from config.db import get_connection
 from datetime import date
 
+
 class VotoService:
     @staticmethod
     def obtener_opciones(id_tipo_eleccion):
@@ -26,11 +27,12 @@ class VotoService:
         cursor.execute(query, (hoy, id_tipo_eleccion))
         resultados = cursor.fetchall()
 
-        print("Consulta ejecutada con fecha:", hoy) # cuando es muy tarde toma el hoy como el próximo día
+        # cuando es muy tarde toma el hoy como el próximo día
+        print("Consulta ejecutada con fecha:", hoy)
         print("Resultados obtenidos:", resultados)
 
         if not resultados:
-            return []  
+            return []
 
         opciones = []
 
@@ -69,7 +71,8 @@ class VotoService:
         conn = get_connection()
         cursor = conn.cursor(dictionary=True)
 
-        cursor.execute("SELECT voto, id_circuito FROM VOTANTE WHERE cc_persona = %s", (data["cc_persona"],))
+        cursor.execute(
+            "SELECT voto, id_circuito FROM VOTANTE WHERE cc = %s", (data["cc"],))
         votante = cursor.fetchone()
 
         if not votante:
@@ -101,7 +104,8 @@ class VotoService:
 
         cursor.execute(insert, values)
 
-        cursor.execute("UPDATE VOTANTE SET voto = TRUE WHERE cc_persona = %s", (data["cc_persona"],))
+        cursor.execute(
+            "UPDATE VOTANTE SET voto = TRUE WHERE cc = %s", (data["cc"],))
 
         conn.commit()
         return True
