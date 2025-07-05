@@ -11,6 +11,37 @@ class VotoService:
 
         hoy = date.today().strftime('%Y-%m-%d')
 
+        # Get the election closest to today (before or after)
+        query_eleccion = """
+            SELECT id, id_tipo_eleccion, fecha
+            FROM ELECCION
+            WHERE id_tipo_eleccion = %s
+            ORDER BY ABS(DATEDIFF(fecha, %s)) ASC
+            LIMIT 1
+        """
+        cursor.execute(query_eleccion, (id_tipo_eleccion, hoy))
+        eleccion = cursor.fetchone()
+
+        if not eleccion:
+            return []
+
+        # Defensive: sometimes MySQL returns a dict, sometimes a tuple, sometimes a mix (esp. with date fields)
+        eleccion_id = None
+        if isinstance(eleccion, dict):
+            eleccion_id = eleccion.get('id')
+        elif isinstance(eleccion, (list, tuple)):
+            # Try to find the int id (should not be a date)
+            for v in eleccion:
+                if isinstance(v, int):
+                    eleccion_id = v
+                    break
+        if eleccion_id is None:
+            return []
+        eleccion_tipo = eleccion['id_tipo_eleccion'] if isinstance(
+            eleccion, dict) else eleccion[1]
+        eleccion_fecha = eleccion['fecha'] if isinstance(
+            eleccion, dict) else eleccion[2]
+
         query = """
             SELECT 
                 l.valor AS valor_lista,
@@ -21,36 +52,53 @@ class VotoService:
             FROM LISTA l
             JOIN PARTIDO p ON l.id_partido = p.id
             JOIN ELECCION e ON l.id_eleccion = e.id
-            WHERE DATE(e.fecha) = %s AND e.id_tipo_eleccion = %s
+            WHERE e.id = %s
         """
-
-        cursor.execute(query, (hoy, id_tipo_eleccion))
+        # Ensure only int is passed to query (avoid date, etc)
+        # Defensive: if eleccion_id is not int, try to convert, else skip (avoid date, etc)
+        if not isinstance(eleccion_id, int):
+            # Try to convert only if it's a string or float
+            if isinstance(eleccion_id, (str, float)):
+                try:
+                    eleccion_id = int(eleccion_id)
+                except Exception:
+                    return []
+            else:
+                return []
+        cursor.execute(query, (eleccion_id,))
         resultados = cursor.fetchall()
 
-        # cuando es muy tarde toma el hoy como el próximo día
-        print("Consulta ejecutada con fecha:", hoy)
+        print("Consulta ejecutada para elección id:",
+              eleccion_id, "fecha:", eleccion_fecha)
         print("Resultados obtenidos:", resultados)
 
         if not resultados:
             return []
 
         opciones = []
-
         for r in resultados:
+            # r is a dict if dictionary=True, else a tuple
+            valor_lista = r['valor_lista'] if isinstance(r, dict) else r[0]
+            id_partido = r['id_partido'] if isinstance(r, dict) else r[1]
+            id_eleccion = r['id_eleccion'] if isinstance(r, dict) else r[2]
+            id_tipo_eleccion = r['id_tipo_eleccion'] if isinstance(
+                r, dict) else r[3]
+            nombre_partido = r['nombre_partido'] if isinstance(
+                r, dict) else r[4]
             opciones.append({
-                "valor_lista": r["valor_lista"],
-                "id_partido": r["id_partido"],
-                "id_eleccion": r["id_eleccion"],
-                "id_tipo_eleccion": r["id_tipo_eleccion"],
-                "label": f"Lista {r['valor_lista']} - {r['nombre_partido']}",
+                "valor_lista": valor_lista,
+                "id_partido": id_partido,
+                "id_eleccion": id_eleccion,
+                "id_tipo_eleccion": id_tipo_eleccion,
+                "label": f"Lista {valor_lista} - {nombre_partido}",
                 "id_tipo_voto": 1  # válido
             })
 
         opciones.append({
             "valor_lista": 0,
             "id_partido": 0,
-            "id_eleccion": resultados[0]["id_eleccion"] if resultados else 1,
-            "id_tipo_eleccion": resultados[0]["id_tipo_eleccion"] if resultados else 1,
+            "id_eleccion": opciones[0]["id_eleccion"] if opciones else 1,
+            "id_tipo_eleccion": opciones[0]["id_tipo_eleccion"] if opciones else 1,
             "label": "Blanco",
             "id_tipo_voto": 2  # blanco
         })
@@ -58,8 +106,8 @@ class VotoService:
         opciones.append({
             "valor_lista": 0,
             "id_partido": 0,
-            "id_eleccion": resultados[0]["id_eleccion"] if resultados else 1,
-            "id_tipo_eleccion": resultados[0]["id_tipo_eleccion"] if resultados else 1,
+            "id_eleccion": opciones[0]["id_eleccion"] if opciones else 1,
+            "id_tipo_eleccion": opciones[0]["id_tipo_eleccion"] if opciones else 1,
             "label": "Anulado",
             "id_tipo_voto": 3  # anulado
         })
