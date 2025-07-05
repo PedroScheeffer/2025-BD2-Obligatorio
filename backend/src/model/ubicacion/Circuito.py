@@ -11,7 +11,7 @@ class CircuitoSchema(BaseModel):
     accesibilidad: bool
     id_establecimiento: int
     id_eleccion: int
-    id_tipo_eleccion: int
+
 
 
 class Circuito(BaseEntity):
@@ -21,12 +21,11 @@ class Circuito(BaseEntity):
         "accesibilidad",
         "id_establecimiento",
         "id_eleccion",
-        "id_tipo_eleccion"
     ]
 
-    def __init__(self, id: Optional[int], accesibilidad: bool, id_establecimiento: int,  id_eleccion: int, id_tipo_eleccion: int):
+    def __init__(self, id: Optional[int], accesibilidad: bool, id_establecimiento: int,  id_eleccion: int):
         self.id = id
         self.accesibilidad = accesibilidad
         self.id_establecimiento = id_establecimiento
         self.id_eleccion = id_eleccion
-        self.id_tipo_eleccion = id_tipo_eleccion
+
