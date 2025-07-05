@@ -39,7 +39,7 @@ const Votar = () => {
       id_circuito: parseInt(id_circuito),
       fecha: new Date().toISOString().split("T")[0],
       es_observado: false,
-      cc_persona: cc, 
+      cc: cc, 
     };
 
     try {

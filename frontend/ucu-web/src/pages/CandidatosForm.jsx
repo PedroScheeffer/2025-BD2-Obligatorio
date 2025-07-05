@@ -25,7 +25,7 @@ const CandidatosForm = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          cc_persona: cc,
+          cc: cc,
           nombre,
           fecha_nacimiento: nacimiento,
           id_tipo: idTipo,
