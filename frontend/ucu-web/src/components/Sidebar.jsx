@@ -9,6 +9,8 @@ const Sidebar = ({ setCurrentPage }) => {
       <Button onClick={() => setCurrentPage("listas")}>Cargar listas</Button>
       <Button onClick={() => setCurrentPage("candidatos")}>Cargar candidatos</Button>
       <Button onClick={() => setCurrentPage("circuitos")}>Cargar circuitos</Button>
+      <Button onClick={() => setCurrentPage("circuitos")}>Cargar circuitos</Button>
+      <Button onClick={() => setCurrentPage("ver-votantes")}>Ver votantes</Button>
 
       {/* Funciones de votación */}
       <Button onClick={() => setCurrentPage("ver-resultados")}>Ver resultados</Button>

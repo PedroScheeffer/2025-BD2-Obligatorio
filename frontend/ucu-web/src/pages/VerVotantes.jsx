@@ -3,25 +3,36 @@ import { Typography, Box, Select, MenuItem, FormControl, InputLabel, Table, Tabl
 import FormContainer from "../components/FormContainer";
 
 const VerVotantes = () => {
+  const [elecciones, setElecciones] = useState([]);
+  const [eleccionSeleccionada, setEleccionSeleccionada] = useState("");
   const [circuitos, setCircuitos] = useState([]);
   const [circuitoSeleccionado, setCircuitoSeleccionado] = useState("");
   const [votantes, setVotantes] = useState([]);
 
   useEffect(() => {
-    const fetchCircuitos = async () => {
+    const fetchElecciones = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/circuitos");
+        const res = await fetch("http://localhost:8000/api/elecciones-con-circuitos");
         const data = await res.json();
-        setCircuitos(data);
+        setElecciones(data);
       } catch (err) {
-        console.error("Error cargando circuitos:", err);
+        console.error("Error cargando elecciones:", err);
       }
     };
 
-    fetchCircuitos();
+    fetchElecciones();
   }, []);
 
-  const handleChange = async (event) => {
+  const handleEleccionChange = (event) => {
+    const selectedId = event.target.value;
+    setEleccionSeleccionada(selectedId);
+    const seleccionada = elecciones.find(e => e.id === selectedId);
+    setCircuitos(seleccionada ? seleccionada.circuitos : []);
+    setCircuitoSeleccionado("");
+    setVotantes([]);
+  };
+
+  const handleCircuitoChange = async (event) => {
     const selectedId = event.target.value;
     setCircuitoSeleccionado(selectedId);
 
@@ -41,17 +52,34 @@ const VerVotantes = () => {
       </Typography>
 
       <Box sx={{ mt: 4, width: "100%" }}>
+        <FormControl fullWidth sx={{ mb: 2 }}>
+          <InputLabel id="eleccion-label">Seleccione una elección</InputLabel>
+          <Select
+            labelId="eleccion-label"
+            value={eleccionSeleccionada}
+            label="Seleccione una elección"
+            onChange={handleEleccionChange}
+          >
+            {elecciones.map((eleccion) => (
+              <MenuItem key={eleccion.id} value={eleccion.id}>
+                {eleccion.fecha}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
         <FormControl fullWidth>
           <InputLabel id="circuito-label">Seleccione un circuito</InputLabel>
           <Select
             labelId="circuito-label"
             value={circuitoSeleccionado}
             label="Seleccione un circuito"
-            onChange={handleChange}
+            onChange={handleCircuitoChange}
+            disabled={!eleccionSeleccionada}
           >
             {circuitos.map((circuito) => (
               <MenuItem key={circuito.id} value={circuito.id}>
-                {circuito.nombre}
+                {`ID: ${circuito.id}`}
               </MenuItem>
             ))}
           </Select>

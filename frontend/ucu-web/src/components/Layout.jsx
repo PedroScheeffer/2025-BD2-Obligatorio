@@ -6,6 +6,7 @@ import ListaForm from "../pages/ListaForm";
 import CandidatosForm from "../pages/CandidatosForm";
 import CircuitosForm from "../pages/CircuitosForm";
 import VerResultados from "../pages/VerResultados";
+import VerVotantes from "../pages/VerVotantes"
 
 const Layout = ({ currentPage, setCurrentPage }) => {
   const renderContent = () => {

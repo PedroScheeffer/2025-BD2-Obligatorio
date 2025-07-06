@@ -87,13 +87,6 @@ function Login({ onLogin }) {
               <MenuItem value="votante">Votante</MenuItem>
               <MenuItem value="funcionario">Funcionario</MenuItem>
             </TextField>
-            {/* Test credentials for quick login */}
-            <Box sx={{ mt: 2, p: 2, bgcolor: '#f5f5f5', borderRadius: 2, fontSize: 14 }}>
-              <Typography variant="subtitle2" sx={{ mb: 1 }}>Credenciales de prueba:</Typography>
-              <div>
-                <b>Votante</b>:<br />Usuario: <code>ABC 001</code><br />Contraseña: <code>1234</code></div>
-              <div style={{ marginTop: 8 }}><b>Funcionario</b>:<br />Usuario: <code>JKL 004</code><br />Contraseña: <code>1234</code></div>
-            </Box>
           </Box>
           <Button type="submit" variant="contained" color="success" sx={{ mt: 7 }}>Ingresar</Button>
         </Box>
