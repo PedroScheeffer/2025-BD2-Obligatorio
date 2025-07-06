@@ -20,8 +20,10 @@ const Layout = ({ currentPage, setCurrentPage }) => {
         return <CircuitosForm />;
       case "ver-resultados":
         return <VerResultados tipo={currentPage} />;
+      case "ver-votantes":
+        return <VerVotantes tipo={currentPage} />;
       default:
-        return <div>Seleccioná una opción</div>;
+        return <div>Seleccione una opción</div>;
     }
   };
 

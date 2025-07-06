@@ -7,6 +7,7 @@ from model.personas.Persona import PersonaSchema
 from services.PersonaService import PersonaService
 from services.VotoService import VotoService
 from services.ResultadoService import ResultadosService
+from services.VerVotantesService import VerVotantesService
 
 # MODEL PARA CHECKEAR CONEXIÓN A LA BASE DE DATOS.
 from services.orm_casero.MySQLScriptRunner import MySQLScriptRunner
@@ -188,3 +189,6 @@ def obtener_partidos():
 
     return partidos
 
+@router.get("/votantes/circuito/{id_circuito}")
+def get_votantes(id_circuito: int):
+    return VerVotantesService.obtener_votantes_por_circuito(id_circuito)
