@@ -1,5 +1,31 @@
 Proyecto para base de datos II, equipo 3
 
+
+# Como ejecutar.
+Defina el archivo `.env` con los valores de entorno de la base de datos:
+
+```
+DB_HOST=***
+DB_PORT=***
+DB_USER=***
+DB_PASSWORD=***
+DB_NAME=IC_Grupo3
+```
+
+Después, en la consola, en el directorio principal, utilice el comando:
+
+```
+docker compose up -d
+```
+
+Luego se puede usar las credenciales 
+- Funcionario
+JKL 004 
+contra 1234
+- Votante
+ABC 001
+contra 1234
+
 # Definición de servicios backend
 
 ## Servicio Persona

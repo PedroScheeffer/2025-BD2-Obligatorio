@@ -1,5 +1,5 @@
 # Usa una imagen oficial de Python como base.
-FROM python:3.9-slim
+FROM python
 
 # Establece el directorio de trabajo dentro del contenedor.
 WORKDIR /src

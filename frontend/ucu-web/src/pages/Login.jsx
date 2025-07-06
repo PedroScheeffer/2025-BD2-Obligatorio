@@ -6,9 +6,37 @@ function Login({ onLogin }) {
   const [password, setPassword] = useState("");
   const [rol, setRol] = useState("votante");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onLogin(rol);
+
+    try {
+      const response = await fetch("http://localhost:8000/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          credencial,
+          contrasena: password,
+          rol,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Credenciales inválidas");
+      }
+
+      const data = await response.json();
+
+      localStorage.setItem("cc", data.persona.cc);
+      if (rol === "votante" && data.id_circuito) {
+        localStorage.setItem("id_circuito", data.id_circuito);
+      }
+
+      onLogin(rol, data);
+    } catch (err) {
+      alert("Error de login: " + err.message);
+    }
   };
 
   return (
@@ -16,7 +44,7 @@ function Login({ onLogin }) {
       <Box
         sx={{
           flex: 3,
-          backgroundColor: "#fff8e1", 
+          backgroundColor: "#fff8e1",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -60,22 +88,22 @@ function Login({ onLogin }) {
               <MenuItem value="funcionario">Funcionario</MenuItem>
             </TextField>
           </Box>
-            <Button type="submit" variant="contained" color="success" sx={{ mt: 7 }}>Ingresar</Button>
+          <Button type="submit" variant="contained" color="success" sx={{ mt: 7 }}>Ingresar</Button>
         </Box>
       </Box>
 
-    <Box sx={{ flex: 2, display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <img
-        src="/voto.png"
-        alt="Voto ilustración"
-        style={{
-          width: "100%",
-          height: "100%",
-          opacity: "60%",
-          objectFit: "cover",
-        }}
-      />
-    </Box>
+      <Box sx={{ flex: 2, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <img
+          src="/voto.png"
+          alt="Voto ilustración"
+          style={{
+            width: "100%",
+            height: "100%",
+            opacity: "60%",
+            objectFit: "cover",
+          }}
+        />
+      </Box>
     </Box>
   );
 }

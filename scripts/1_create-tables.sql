@@ -25,21 +25,19 @@ CREATE TABLE ZONA (
 );
 
 CREATE TABLE ESTABLECIMIENTO (
-    id INTEGER AUTO_INCREMENT ,
+    id INTEGER AUTO_INCREMENT PRIMARY KEY,
     tipo VARCHAR(255),
     direccion JSON, -- Direccion en formato JSON, con los campos: calle, numero, entre calles, barrio.
     id_zona INTEGER NOT NULL ,
-    PRIMARY KEY (id, id_zona),
     FOREIGN KEY (id_zona) REFERENCES ZONA(id) ON DELETE CASCADE
 );
 
 CREATE TABLE ELECCION (
-    id INTEGER AUTO_INCREMENT ,
+    id INTEGER AUTO_INCREMENT PRIMARY KEY,
 
     fecha DATE NOT NULL,
     id_tipo_eleccion INTEGER NOT NULL ,
 
-    PRIMARY KEY (id, id_tipo_eleccion),
     FOREIGN KEY (id_tipo_eleccion) REFERENCES TIPOELECCION(id)
 );
 
@@ -47,12 +45,10 @@ CREATE TABLE CIRCUITO(
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
     accesibilidad BOOLEAN NOT NULL DEFAULT false,
     id_establecimiento INTEGER NOT NULL,
-    id_zona INTEGER NOT NULL,
     id_eleccion INTEGER NOT NULL,
-    id_tipo_eleccion INTEGER NOT NULL,
 
-    FOREIGN KEY (id_establecimiento, id_zona) REFERENCES ESTABLECIMIENTO(id, id_zona) ON DELETE CASCADE,
-    FOREIGN KEY (id_eleccion, id_tipo_eleccion) REFERENCES ELECCION(id, id_tipo_eleccion) ON DELETE CASCADE
+    FOREIGN KEY (id_establecimiento) REFERENCES ESTABLECIMIENTO(id) ON DELETE CASCADE,
+    FOREIGN KEY (id_eleccion) REFERENCES ELECCION(id) ON DELETE CASCADE
 );
 
 -- Personas y tipos 
@@ -62,58 +58,58 @@ CREATE TABLE PERSONA(
 
     ci VARCHAR(8) NOT NULL UNIQUE CHECK (ci REGEXP '^[0-9]+$'),
     nombre VARCHAR(255),
-    fecha_nacimiento DATE NOT NULL
+    fecha_nacimiento DATE NOT NULL,
+    contrasena TEXT NOT NULL 
 );
 
 CREATE TABLE VOTANTE(
-    cc_persona VARCHAR(15) NOT NULL PRIMARY KEY,
+    cc VARCHAR(15) NOT NULL PRIMARY KEY,
 
     voto BOOLEAN NOT NULL DEFAULT false,
     id_circuito INTEGER NOT NULL,
 
-    FOREIGN KEY (cc_persona) REFERENCES PERSONA(cc) ON DELETE CASCADE,
+    FOREIGN KEY (cc) REFERENCES PERSONA(cc) ON DELETE CASCADE,
     FOREIGN KEY (id_circuito) REFERENCES CIRCUITO(id)
 );
 
 CREATE TABLE POLICIA(
-    cc_persona VARCHAR(15) NOT NULL PRIMARY KEY,
+    cc VARCHAR(15) NOT NULL PRIMARY KEY,
 
     comisaria TEXT NOT NULL,
     fk_id_establecimiento INTEGER NOT NULL,
-    fk_id_zona INTEGER NOT NULL,
-    FOREIGN KEY (cc_persona) REFERENCES PERSONA(cc) ON DELETE CASCADE,
-    FOREIGN KEY (fk_id_establecimiento, fk_id_zona) REFERENCES ESTABLECIMIENTO(id, id_zona) ON DELETE CASCADE
+    FOREIGN KEY (cc) REFERENCES PERSONA(cc) ON DELETE CASCADE,
+    FOREIGN KEY (fk_id_establecimiento ) REFERENCES ESTABLECIMIENTO(id) ON DELETE CASCADE
 );
 
 -- Funcionarios de mesa
 
 CREATE TABLE FUNCIONARIO (
-     cc_persona VARCHAR(15) NOT NULL PRIMARY KEY,
-    FOREIGN KEY (cc_persona) REFERENCES PERSONA(cc) ON DELETE CASCADE
+     cc VARCHAR(15) NOT NULL PRIMARY KEY,
+    FOREIGN KEY (cc) REFERENCES PERSONA(cc) ON DELETE CASCADE
 );
 
 CREATE TABLE PRESIDENTE (
-     cc_persona VARCHAR(15) NOT NULL PRIMARY KEY,
-    FOREIGN KEY (cc_persona) REFERENCES FUNCIONARIO(cc_persona) ON DELETE CASCADE
+     cc VARCHAR(15) NOT NULL PRIMARY KEY,
+    FOREIGN KEY (cc) REFERENCES FUNCIONARIO(cc) ON DELETE CASCADE
 );
 
 CREATE TABLE SECRETARIO (
-     cc_persona VARCHAR(15) NOT NULL PRIMARY KEY,
-    FOREIGN KEY (cc_persona) REFERENCES FUNCIONARIO(cc_persona) ON DELETE CASCADE
+     cc VARCHAR(15) NOT NULL PRIMARY KEY,
+    FOREIGN KEY (cc) REFERENCES FUNCIONARIO(cc) ON DELETE CASCADE
 );
 
 CREATE TABLE VOCAL (
-    cc_persona VARCHAR(15) NOT NULL PRIMARY KEY,
-    FOREIGN KEY (cc_persona) REFERENCES FUNCIONARIO(cc_persona) ON DELETE CASCADE
+    cc VARCHAR(15) NOT NULL PRIMARY KEY,
+    FOREIGN KEY (cc) REFERENCES FUNCIONARIO(cc) ON DELETE CASCADE
 );
 
 
 
 CREATE TABLE CANDIDATO (
-    cc_persona VARCHAR(15) NOT NULL PRIMARY KEY,
+    cc VARCHAR(15) NOT NULL PRIMARY KEY,
     id_tipo INTEGER NOT NULL,
 
-    FOREIGN KEY (cc_persona) REFERENCES PERSONA(cc) ON DELETE CASCADE,
+    FOREIGN KEY (cc) REFERENCES PERSONA(cc) ON DELETE CASCADE,
     FOREIGN KEY (id_tipo) REFERENCES TIPOCANDIDATO(id)
 );
 
@@ -126,9 +122,9 @@ CREATE TABLE MESA (
     cc_presidente VARCHAR(15) NOT NULL,
 
     FOREIGN KEY (id_circuito) REFERENCES CIRCUITO(id) ON DELETE CASCADE,
-    FOREIGN KEY (cc_vocal) REFERENCES VOCAL(cc_persona),
-    FOREIGN KEY (cc_secretario) REFERENCES SECRETARIO(cc_persona),
-    FOREIGN KEY (cc_presidente) REFERENCES PRESIDENTE(cc_persona)
+    FOREIGN KEY (cc_vocal) REFERENCES VOCAL(cc),
+    FOREIGN KEY (cc_secretario) REFERENCES SECRETARIO(cc),
+    FOREIGN KEY (cc_presidente) REFERENCES PRESIDENTE(cc)
 );
 
 CREATE TABLE PARTIDO (
@@ -143,17 +139,16 @@ CREATE TABLE LISTA (
     valor INTEGER NOT NULL,
     id_partido INTEGER NOT NULL,
     id_eleccion INTEGER NOT NULL,
-    id_tipo_eleccion INTEGER NOT NULL,
 
-    PRIMARY KEY (valor, id_partido, id_eleccion, id_tipo_eleccion),
+    PRIMARY KEY (valor, id_partido, id_eleccion),
 
     FOREIGN KEY (id_partido) REFERENCES PARTIDO(id) ON DELETE CASCADE,
-    FOREIGN KEY (id_eleccion, id_tipo_eleccion) REFERENCES ELECCION(id, id_tipo_eleccion) ON DELETE CASCADE
+    FOREIGN KEY (id_eleccion) REFERENCES ELECCION(id) ON DELETE CASCADE
 );
 
 
 CREATE TABLE VOTO (
-    id INTEGER AUTO_INCREMENT,
+    id INTEGER AUTO_INCREMENT PRIMARY KEY,
     valor_lista INTEGER NOT NULL,
     id_partido INTEGER NOT NULL,
     id_eleccion INTEGER NOT NULL,
@@ -163,20 +158,18 @@ CREATE TABLE VOTO (
     id_circuito INTEGER NOT NULL,
     fecha DATE NOT NULL,
 
-    PRIMARY KEY (id, id_tipo_voto, valor_lista, id_circuito),
     FOREIGN KEY (id_tipo_voto) REFERENCES TIPOVOTO(id),
-    FOREIGN KEY (valor_lista, id_partido, id_eleccion, id_tipo_eleccion) REFERENCES LISTA(valor, id_partido, id_eleccion, id_tipo_eleccion),
+    FOREIGN KEY (valor_lista, id_partido, id_eleccion) REFERENCES LISTA(valor, id_partido, id_eleccion),
     FOREIGN KEY (id_circuito) REFERENCES CIRCUITO(id)
 );
 
 CREATE TABLE CANDIDATO_LISTA(
-    cc_persona VARCHAR(15) NOT NULL,
+    cc VARCHAR(15) NOT NULL,
     valor_lista INTEGER NOT NULL,
     id_partido INTEGER NOT NULL,
     id_eleccion INTEGER NOT NULL,
-    id_tipo_eleccion INTEGER NOT NULL,
 
-    PRIMARY KEY (cc_persona, valor_lista, id_partido, id_eleccion),
-    FOREIGN KEY (cc_persona) REFERENCES PERSONA(cc),
-    FOREIGN KEY (valor_lista, id_partido, id_eleccion, id_tipo_eleccion) REFERENCES LISTA(valor, id_partido, id_eleccion, id_tipo_eleccion)
+    PRIMARY KEY (cc, valor_lista, id_partido, id_eleccion),
+    FOREIGN KEY (cc) REFERENCES PERSONA(cc),
+    FOREIGN KEY (valor_lista, id_partido, id_eleccion) REFERENCES LISTA(valor, id_partido, id_eleccion)
 );

@@ -18,7 +18,7 @@ class Zona(BaseEntity):
     table_name = "ZONA"
     values_needed = ["id", "paraje", "ciudad", "departamento", "municipio"]
 
-    def __init__(self, id: int, paraje: str, ciudad: str, departamento: str, municipio: str):
+    def __init__(self, id: int | None, paraje: str, ciudad: str, departamento: str, municipio: str):
         self.id = id
         self.paraje = paraje
         self.ciudad = ciudad

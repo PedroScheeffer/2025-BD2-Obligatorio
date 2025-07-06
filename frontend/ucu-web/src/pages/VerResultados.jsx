@@ -1,12 +1,22 @@
 import React, { useState } from "react";
-import { Typography, Box, Select, MenuItem, FormControl, InputLabel } from "@mui/material";
+import { Typography, Box, Select, MenuItem, FormControl, InputLabel, Table, TableBody, TableCell, TableHead, TableRow, Paper } from "@mui/material";
 import FormContainer from "../components/FormContainer";
 
 const VerResultados = ({ tipo }) => {
   const [categoria, setCategoria] = useState("");
+  const [resultados, setResultados] = useState([]);
 
-  const handleChange = (event) => {
-    setCategoria(event.target.value);
+  const handleChange = async (event) => {
+    const selected = event.target.value;
+    setCategoria(selected);
+
+    try {
+      const res = await fetch(`http://localhost:8000/api/resultados/${selected}`);
+      const data = await res.json();
+      setResultados(data);
+    } catch (err) {
+      console.error("Error al obtener resultados:", err);
+    }
   };
 
   const opcionesPorTipo = {
@@ -44,9 +54,32 @@ const VerResultados = ({ tipo }) => {
         </FormControl>
       </Box>
 
-      {categoria && (
+      {categoria && resultados.length > 0 && (
         <Box sx={{ mt: 4 }}>
-          {/* contenido específico según categoría */}
+          <Paper>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>{categoria.toUpperCase()}</TableCell>
+                  <TableCell>Votos válidos</TableCell>
+                  <TableCell>Votos anulados</TableCell>
+                  <TableCell>Votos en blanco</TableCell>
+                  <TableCell>Votos observados</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {resultados.map((item, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{item.nombre}</TableCell>
+                    <TableCell>{item.votos_validos}</TableCell>
+                    <TableCell>{item.votos_anulados}</TableCell>
+                    <TableCell>{item.votos_blanco}</TableCell>
+                    <TableCell>{item.votos_observados}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Paper>
         </Box>
       )}
     </FormContainer>
